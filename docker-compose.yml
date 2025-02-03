@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  ecmp-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      ecmp_test_1:
+        ipv4_address: 10.10.0.1
+        priority: 20
+      ecmp_test_2:
+        ipv4_address: 10.20.0.1
+        priority: 10
+networks:
+  ecmp_test_1:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.10.0.0/24
+          ip_range: 10.10.0.0/24
+          gateway: 10.10.0.254
+  ecmp_test_2:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.20.0.0/24
+          ip_range: 10.20.0.0/24
+          gateway: 10.20.0.254
