@@ -1,8 +1,11 @@
 FROM debian:12-slim
 
 # Install FRR and dependencies
-RUN apt-get update \
-    && apt-get --no-install-recommends --yes install frr iproute2 python3-pip \
+RUN curl -s https://deb.frrouting.org/frr/keys.gpg | sudo tee /usr/share/keyrings/frrouting.gpg > /dev/null \
+    && FRRVER="frr-9.1" echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
+        $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list \
+    && apt-get update \
+    && apt-get --no-install-recommends --yes install frr frr-pythontools iproute2 python3-pip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
