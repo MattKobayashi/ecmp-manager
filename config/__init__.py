@@ -19,7 +19,6 @@ def load_config():
         interfaces.append(Interface(
             name=interface_name,
             metric=iface_data["metric"],
-            if_type=iface_data["type"],
             check_interval=iface_data["check_interval"],
             target_ip=iface_data["target_ip"]
         ))
