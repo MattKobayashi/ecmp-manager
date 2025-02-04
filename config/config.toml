@@ -1,11 +1,3 @@
-[interface.eth1]
-type = "dhcp"
-check_interval = 10  # seconds
-target_ip = "1.1.1.1"
-metric = 100
-
-[interface.eth2]
-type = "dhcp"
-check_interval = 10
-target_ip = "1.1.1.1"
-metric = 200
+[interface]
+eth1 = { type = "dhcp", check_interval = 10, target_ip = "1.1.1.1", metric = 100 }
+eth2 = { type = "dhcp", check_interval = 10, target_ip = "1.1.1.1", metric = 200 }
