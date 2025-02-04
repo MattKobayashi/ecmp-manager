@@ -1,8 +1,8 @@
 import logging.config
 from time import sleep
-from .frr import FRRClient
-from .health_checks import is_interface_healthy
-from .config import load_config
+from frr import FRRClient
+from health_checks import is_interface_healthy
+from config import load_config
 
 
 def main_loop():
