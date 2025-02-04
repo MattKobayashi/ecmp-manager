@@ -7,7 +7,7 @@ class Config:
         self.min_check_interval = min(iface.check_interval for iface in interfaces)
 
 def load_config():
-    config_path = "config.toml"
+    config_path = "config/config.toml"
     data = toml.load(config_path)
 
     interfaces = []
