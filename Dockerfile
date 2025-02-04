@@ -10,6 +10,7 @@ WORKDIR /app
 RUN mkdir -p /var/log/ecmp-manager
 COPY config/config.toml ./config/
 COPY . .
-RUN pip install --break-system-packages --no-cache-dir -r requirements.txt
+RUN pip install --break-system-packages --no-cache-dir -r requirements.txt \
+    && chmod +x entrypoint.sh
 
-CMD ["python3", "-u", "daemon.py"]
+CMD ["/app/entrypoint.sh"]
