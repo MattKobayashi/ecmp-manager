@@ -86,8 +86,8 @@ def is_interface_healthy(
     logger.debug(f"TCP check parameters - IP: {check_ip}, Port: {check_port}, Timeout: {timeout}s")
     try:
         syn_packet = (
-            scapy.Ether(dst=dest_mac)/
-            scapy.IP(dst=check_ip)/
+            scapy.Ether(dst=dest_mac) /
+            scapy.IP(dst=check_ip) /
             scapy.TCP(
                 sport=random.randint(1024, 65535),
                 dport=check_port,

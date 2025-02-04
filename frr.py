@@ -9,7 +9,7 @@ class FRRClient:
         """Log vtysh command execution details"""
         logger.debug(f"Executing FRR command: {command!r}")
         try:
-            result = subprocess.run(
+            subprocess.run(
                 ["vtysh", "-c", command],
                 check=True,
                 stderr=subprocess.PIPE,
@@ -26,7 +26,7 @@ class FRRClient:
         if not interface.gateway:
             logger.debug(f"Route addition failed - no gateway for {interface.name}")
             raise ValueError(f"No gateway found for {interface.name}")
-        
+
         self._execute_vty_command(
             f"configure terminal\n"
             f"ip route 0.0.0.0/0 {interface.gateway} {interface.metric}"
@@ -38,7 +38,7 @@ class FRRClient:
         if not interface.gateway:
             logger.debug(f"Skipping removal for {interface.name} - no gateway configured")
             return
-            
+
         logger.debug(f"Attempting to remove route for {interface.name} (GW: {interface.gateway}, Metric: {interface.metric})")
         self._execute_vty_command(
             f"configure terminal\n"
