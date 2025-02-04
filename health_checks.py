@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 def get_default_gateway(interface: str) -> str:
     """Get the default gateway IP for a specific interface using ip route"""
-    logger.debug(f"Querying default gateway for interface {interface} using 'ip route'")
+    logger.debug("Querying default gateway for interface %s using 'ip route'", interface)
     try:
         result = subprocess.run(
             ["ip", "-json", "route", "show", "dev", interface],
@@ -19,28 +19,28 @@ def get_default_gateway(interface: str) -> str:
             text=True,
             check=True
         )
-        logger.debug(f"Raw ip route output: {result.stdout}")
+        logger.debug("Raw ip route output: %s", result.stdout)
         routes = json.loads(result.stdout)
         for route in routes:
             if route.get("dst") == "default":
-                logger.debug(f"Found default gateway {route['gateway']} on {interface}")
+                logger.debug("Found default gateway %s on %s", route['gateway'], interface)
                 return route["gateway"]
-        logger.debug(f"No default route in {len(routes)} routes found for {interface}")
+        logger.debug("No default route in %d routes found for %s", len(routes), interface)
         raise ValueError(f"No default route found for {interface}")
     except json.JSONDecodeError:
-        logger.debug(f"Invalid JSON output from ip route: {result.stdout}", exc_info=True)
+        logger.debug("Invalid JSON output from ip route: %s", result.stdout, exc_info=True)
         raise RuntimeError("Failed to parse ip route output")
     except subprocess.CalledProcessError as e:
-        logger.debug(f"Command failed: {e.cmd} (code {e.returncode}). Stderr: {e.stderr}")
+        logger.debug("Command failed: %s (code %d). Stderr: %s", e.cmd, e.returncode, e.stderr)
         raise RuntimeError(f"Failed to get routes for {interface}: {e.stderr}") from e
 
 
 def get_next_hop_mac(interface) -> Optional[str]:
     """Resolve gateway IP to MAC address using ARP"""
     try:
-        logger.debug(f"Starting ARP resolution for {interface.name}")
+        logger.debug("Starting ARP resolution for %s", interface.name)
         gateway_ip = get_default_gateway(interface.name)
-        logger.debug(f"Sending ARP broadcast for {gateway_ip} via {interface.name}")
+        logger.debug("Sending ARP broadcast for %s via %s", gateway_ip, interface.name)
         ans, _ = scapy.srp(
             scapy.Ether(dst="ff:ff:ff:ff:ff:ff")/scapy.ARP(pdst=gateway_ip),
             timeout=1,
@@ -48,15 +48,15 @@ def get_next_hop_mac(interface) -> Optional[str]:
             iface=interface.name,
         )
         if ans:
-            logger.debug(f"ARP response received from {ans[0][1].hwsrc} (IP: {gateway_ip})")
+            logger.debug("ARP response received from %s (IP: %s)", ans[0][1].hwsrc, gateway_ip)
         else:
-            logger.debug(f"No ARP response received within timeout period for {gateway_ip}")
+            logger.debug("No ARP response received within timeout period for %s", gateway_ip)
         return ans[0][1].hwsrc if ans else None
     except (Scapy_Exception, RuntimeError, ValueError, IndexError) as e:
-        logger.debug(f"ARP exception details - Interface: {interface.name}, "
-                     f"Gateway: {gateway_ip if 'gateway_ip' in locals() else 'Unknown'}", 
-                     exc_info=True)
-        logger.error(f"ARP resolution failed for {interface.name}: {str(e)}")
+        logger.debug("ARP exception details - Interface: %s, Gateway: %s", 
+                    interface.name, locals().get('gateway_ip', 'Unknown'), 
+                    exc_info=True)
+        logger.error("ARP resolution failed for %s: %s", interface.name, str(e))
         return None
 
 
@@ -68,22 +68,22 @@ def is_interface_healthy(
 ) -> bool:
     """Forced TCP connectivity test via interface's gateway"""
     try:
-        logger.debug(f"Starting health check for {interface.name} (target IP: {check_ip})")
+        logger.debug("Starting health check for %s (target IP: %s)", interface.name, check_ip)
         interface.gateway = get_default_gateway(interface.name)
-        logger.debug(f"Resolved gateway {interface.gateway} for {interface.name}")
+        logger.debug("Resolved gateway %s for %s", interface.gateway, interface.name)
     except (RuntimeError, ValueError):
-        logger.debug(f"Gateway resolution failed for {interface.name}", exc_info=True)
+        logger.debug("Gateway resolution failed for %s", interface.name, exc_info=True)
         return False
 
-    logger.debug(f"Testing next hop MAC for interface {interface.name}")
+    logger.debug("Testing next hop MAC for interface %s", interface.name)
     if (dest_mac := get_next_hop_mac(interface)) is None:
-        logger.debug(f"Aborting health check - no next hop MAC for {interface.name}")
+        logger.debug("Aborting health check - no next hop MAC for %s", interface.name)
         return False
 
     if check_ip is None:
         check_ip = interface.target_ip
 
-    logger.debug(f"TCP check parameters - IP: {check_ip}, Port: {check_port}, Timeout: {timeout}s")
+    logger.debug("TCP check parameters - IP: %s, Port: %d, Timeout: %ds", check_ip, check_port, timeout)
     try:
         syn_packet = (
             scapy.Ether(dst=dest_mac) /
@@ -94,8 +94,8 @@ def is_interface_healthy(
                 flags="S"
             )
         )
-        logger.debug(f"Sending SYN packet to {check_ip}:{check_port} via {interface.name} "
-                    f"(MAC: {dest_mac})")
+        logger.debug("Sending SYN packet to %s:%d via %s (MAC: %s)", 
+                    check_ip, check_port, interface.name, dest_mac)
         response = scapy.srp1(
             syn_packet,
             timeout=timeout,
@@ -103,15 +103,17 @@ def is_interface_healthy(
             iface=interface.name,
             nofilter=True
         )
-        logger.debug(f"TCP response flags: {int(response[scapy.TCP].flags):#04x}" if response 
-                    else "No TCP response received")
+        if response:
+            logger.debug("TCP response flags: %#04x", int(response[scapy.TCP].flags))
+        else:
+            logger.debug("No TCP response received")
         return (
             response and
             response.haslayer(scapy.TCP) and
             response[scapy.TCP].flags & 0x12 == 0x12  # SYN-ACK
         )
     except (Scapy_Exception, AttributeError, IndexError) as e:
-        logger.debug(f"TCP check failed - Dest: {check_ip}:{check_port}, Interface: {interface.name}",
-                    exc_info=True)
-        logger.error(f"TCP health check failed for {interface.name}: {str(e)}")
+        logger.debug("TCP check failed - Dest: %s:%d, Interface: %s",
+                    check_ip, check_port, interface.name, exc_info=True)
+        logger.error("TCP health check failed for %s: %s", interface.name, str(e))
         return False

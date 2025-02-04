@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 class FRRClient:
     def _execute_vty_command(self, command):
         """Log vtysh command execution details"""
-        logger.debug(f"Executing FRR command: {command!r}")
+        logger.debug("Executing FRR command: %r", command)
         try:
             subprocess.run(
                 ["vtysh", "-c", command],
@@ -15,33 +15,33 @@ class FRRClient:
                 stderr=subprocess.PIPE,
                 text=True
             )
-            logger.debug(f"FRR command executed successfully")
+            logger.debug("FRR command executed successfully")
         except subprocess.CalledProcessError as e:
-            logger.debug(f"FRR command failed with code {e.returncode}. Error: {e.stderr.strip()}")
+            logger.debug("FRR command failed with code %d. Error: %s", e.returncode, e.stderr.strip())
             raise
 
     def add_route(self, interface):
         """Log route addition attempts and parameters"""
-        logger.debug(f"Attempting to add route for {interface.name} (GW: {interface.gateway}, Metric: {interface.metric})")
+        logger.debug("Attempting to add route for %s (GW: %s, Metric: %s)", interface.name, interface.gateway, interface.metric)
         if not interface.gateway:
-            logger.debug(f"Route addition failed - no gateway for {interface.name}")
+            logger.debug("Route addition failed - no gateway for %s", interface.name)
             raise ValueError(f"No gateway found for {interface.name}")
 
         self._execute_vty_command(
             f"configure terminal\n"
             f"ip route 0.0.0.0/0 {interface.gateway} {interface.metric}"
         )
-        logger.debug(f"Route successfully added for {interface.name}")
+        logger.debug("Route successfully added for %s", interface.name)
 
     def remove_route(self, interface):
         """Log route removal attempts and validation"""
         if not interface.gateway:
-            logger.debug(f"Skipping removal for {interface.name} - no gateway configured")
+            logger.debug("Skipping removal for %s - no gateway configured", interface.name)
             return
 
-        logger.debug(f"Attempting to remove route for {interface.name} (GW: {interface.gateway}, Metric: {interface.metric})")
+        logger.debug("Attempting to remove route for %s (GW: %s, Metric: %s)", interface.name, interface.gateway, interface.metric)
         self._execute_vty_command(
             f"configure terminal\n"
             f"no ip route 0.0.0.0/0 {interface.gateway} {interface.metric}"
         )
-        logger.debug(f"Route successfully removed for {interface.name}")
+        logger.debug("Route successfully removed for %s", interface.name)

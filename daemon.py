@@ -17,7 +17,7 @@ def main_loop():
     try:
         while True:
             for interface in config.interfaces:
-                logger.debug(f"Checking interface {interface.name}")
+                logger.debug("Checking interface %s", interface.name)
                 if is_interface_healthy(
                     interface,
                     check_ip=interface.target_ip,
@@ -31,7 +31,7 @@ def main_loop():
     except KeyboardInterrupt:
         logger.info("Received shutdown signal")
     except Exception as e:
-        logger.critical(f"Fatal error: {str(e)}", exc_info=True)
+        logger.critical("Fatal error: %s", str(e), exc_info=True)
         raise
 
 
