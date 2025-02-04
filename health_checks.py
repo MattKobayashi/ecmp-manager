@@ -26,7 +26,6 @@ def get_default_gateway(interface: str) -> str:
                 logger.debug("Found default gateway %s on %s", route['gateway'], interface)
                 return route["gateway"]
         logger.debug("No default route in %d routes found for %s", len(routes), interface)
-        raise ValueError(f"No default route found for {interface}")
     except json.JSONDecodeError:
         logger.debug("Invalid JSON output from ip route: %s", result.stdout, exc_info=True)
         raise RuntimeError("Failed to parse ip route output")
