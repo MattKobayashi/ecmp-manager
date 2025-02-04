@@ -8,3 +8,4 @@ class Interface:
         self.if_type = if_type  # "dhcp" or "pppoe"
         self.check_interval = check_interval
         self.target_ip = target_ip
+        self.gateway = None  # Dynamic gateway from health checks

@@ -54,7 +54,7 @@ def is_interface_healthy(
 ) -> bool:
     """Forced TCP connectivity test via interface's gateway"""
     try:
-        get_default_gateway(interface.name)
+        interface.gateway = get_default_gateway(interface.name)
     except (RuntimeError, ValueError):
         return False
 
