@@ -103,7 +103,7 @@ def is_interface_healthy(
             iface=interface.name,
             nofilter=True
         )
-        logger.debug(f"TCP response flags: {response[scapy.TCP].flags:#04x}" if response 
+        logger.debug(f"TCP response flags: {int(response[scapy.TCP].flags):#04x}" if response 
                     else "No TCP response received")
         return (
             response and
