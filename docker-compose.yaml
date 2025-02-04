@@ -4,6 +4,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
     networks:
       ecmp_test_1:
         ipv4_address: 10.10.0.1

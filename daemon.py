@@ -21,7 +21,7 @@ def main_loop():
                     interface,
                     check_ip=interface.target_ip,
                     check_port=80,
-                    timeout=2
+                    timeout=1
                 ):
                     frr.add_route(interface)
                 else:
