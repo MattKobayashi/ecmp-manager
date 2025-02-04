@@ -50,7 +50,7 @@ def is_interface_healthy(
     interface,
     check_ip: str = None,
     check_port: int = 80,
-    timeout: int = 2
+    timeout: int = 1
 ) -> bool:
     """Forced TCP connectivity test via interface's gateway"""
     try:
