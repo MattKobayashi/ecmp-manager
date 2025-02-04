@@ -10,11 +10,11 @@ WORKDIR /app
 RUN mkdir -p /var/log/ecmp-manager \
     && mkdir -p config/
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --break-system-packages --no-cache-dir -r requirements.txt
 
 COPY *.py .
 COPY requirements.txt .
 COPY logging.ini .
 COPY config/* config/
 
-CMD ["python", "-u", "daemon.py"]
+CMD ["python3", "-u", "daemon.py"]
