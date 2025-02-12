@@ -21,18 +21,25 @@ def get_gateway_info(interface) -> Optional[tuple[str, str]]:
             check=True
         )
         neighbours = json.loads(result.stdout)
-        
+
         # Find first IPv4 neighbour entry with valid MAC
         for entry in neighbours:
             dst_ip = entry.get("dst", "")
             if scapy.utils.is_valid_ipv4(dst_ip) and entry.get("lladdr"):
-                logger.debug("Found gateway %s (%s) on %s", 
-                            dst_ip, entry["lladdr"], interface.name)
+                logger.debug(
+                    "Found gateway %s (%s) on %s",
+                    dst_ip,
+                    entry["lladdr"],
+                    interface.name
+                )
                 return (dst_ip, entry["lladdr"])
-        
-        logger.debug("No IPv4 gateway found in %d neighbour entries", len(neighbours))
+
+        logger.debug(
+            "No IPv4 gateway found in %d neighbour entries",
+            len(neighbours)
+        )
         return (None, None)
-        
+
     except (json.JSONDecodeError, subprocess.CalledProcessError) as e:
         logger.debug("Failed to get neighbour info: %s", str(e))
         return (None, None)
@@ -49,15 +56,18 @@ def is_interface_healthy(
     if not os.path.exists(f'/sys/class/net/{interface.name}/operstate'):
         logger.debug("Interface %s does not exist", interface.name)
         return False
-        
-    with open(f'/sys/class/net/{interface.name}/operstate') as f:
+
+    with open(
+        f'/sys/class/net/{interface.name}/operstate',
+        encoding='utf-8'
+    ) as f:
         if f.read().strip() != 'up':
             logger.debug("Interface %s is down", interface.name)
             return False
 
     # Get gateway info from single source
     gateway_ip, dest_mac = get_gateway_info(interface)
-    
+
     if not all([gateway_ip, dest_mac]):
         logger.debug("No valid gateway info for %s", interface.name)
         return False
@@ -65,7 +75,12 @@ def is_interface_healthy(
     if check_ip is None:
         check_ip = interface.target_ip
 
-    logger.debug("TCP check parameters - IP: %s, Port: %d, Timeout: %ds", check_ip, check_port, timeout)
+    logger.debug(
+        "TCP check parameters - IP: %s, Port: %d, Timeout: %ds",
+        check_ip,
+        check_port,
+        timeout
+    )
     try:
         syn_packet = (
             scapy.Ether(dst=dest_mac) /
@@ -76,8 +91,10 @@ def is_interface_healthy(
                 flags="S"
             )
         )
-        logger.debug("Sending SYN packet to %s:%d via %s (MAC: %s)", 
-                    check_ip, check_port, interface.name, dest_mac)
+        logger.debug(
+            "Sending SYN packet to %s:%d via %s (MAC: %s)",
+            check_ip, check_port, interface.name, dest_mac
+        )
         response = scapy.srp1(
             syn_packet,
             timeout=timeout,
@@ -86,7 +103,10 @@ def is_interface_healthy(
             nofilter=True
         )
         if response:
-            logger.debug("TCP response flags: %#04x", int(response[scapy.TCP].flags))
+            logger.debug(
+                "TCP response flags: %#04x",
+                int(response[scapy.TCP].flags)
+            )
         else:
             logger.debug("No TCP response received")
         return (
@@ -95,7 +115,13 @@ def is_interface_healthy(
             response[scapy.TCP].flags & 0x12 == 0x12  # SYN-ACK
         )
     except (Scapy_Exception, AttributeError, IndexError) as e:
-        logger.debug("TCP check failed - Dest: %s:%d, Interface: %s",
-                    check_ip, check_port, interface.name, exc_info=True)
-        logger.error("TCP health check failed for %s: %s", interface.name, str(e))
+        logger.debug(
+            "TCP check failed - Dest: %s:%d, Interface: %s",
+            check_ip, check_port, interface.name, exc_info=True
+        )
+        logger.error(
+            "TCP health check failed for %s: %s",
+            interface.name,
+            str(e)
+        )
         return False

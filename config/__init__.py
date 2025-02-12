@@ -20,21 +20,22 @@ class Config:
 
 def load_config():
     """Load and validate routing configuration from config.toml.
-    
+
     Returns:
         Config: Configured interfaces and check interval
-     
+
     Raises:
         ValueError: For invalid configurations, including:
             - Missing required parameters in [interface.auto]
             - No system interfaces found when using auto-config
             - No valid interfaces configured
         FileNotFoundError: If config.toml is missing
-    
+
     Processes both explicitly configured interfaces and auto-detected system
     interfaces. Auto-configuration requires all interface parameters and will
     add any system interfaces not explicitly configured.
     """
+
     config_path = "config/config.toml"
     data = toml.load(config_path)
 

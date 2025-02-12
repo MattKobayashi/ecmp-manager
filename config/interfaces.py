@@ -1,5 +1,6 @@
 import os
 
+
 class Interface:
     """Represents a network interface configuration"""
 
@@ -10,6 +11,7 @@ class Interface:
         self.check_interval = check_interval
         self.target_ip = target_ip
         self.gateway = None  # Dynamic gateway from health checks
+
 
 def get_system_interfaces():
     """Get list of system network interfaces excluding loopback"""
