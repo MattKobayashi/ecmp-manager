@@ -45,7 +45,9 @@ jobs:
       - name: Print IP diagnostics
         run: |
           sudo ip link show
+          echo '---'
           sudo ip address show
+          echo '---'
           sudo ip route show
       # Start the daemon
       - continue-on-error: true
