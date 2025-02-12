@@ -7,7 +7,7 @@ from config import load_config
 
 def main_loop() -> None:
     """ECMP Manager's main control loop.
-    
+
     Responsibilities:
     - Loads routing configuration from config.toml
     - Initializes FRRouting client connection
@@ -16,13 +16,14 @@ def main_loop() -> None:
       - Maintains ECMP routes via FRRouting
       - Adjusts routes based on interface status changes
     - Handles graceful shutdown on interrupt signals
-    
+
     The loop runs indefinitely with sleep intervals determined by the
     smallest check_interval from all configured interfaces.
-    
+
     Raises:
         SystemExit: On unrecoverable configuration or routing errors
     """
+
     # logging.config.fileConfig('logging.ini')
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(__name__)
