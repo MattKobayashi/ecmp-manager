@@ -36,7 +36,6 @@ jobs:
           echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt-get update && sudo apt-get install frr frr-pythontools
-          sudo usermod -a -G frrvty $(whoami)
           sudo systemctl start frr
       # Install dependencies from pip
       - name: Install dependencies from pip
@@ -50,4 +49,4 @@ jobs:
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
-          vtysh -c 'show ip route'
+          sudo vtysh -c 'show ip route'
