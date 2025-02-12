@@ -27,15 +27,17 @@ jobs:
       # https://github.com/actions/checkout
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
-      # Install FRRouting
+      # Install and start FRRouting
       - env:
           FRRVER: frr-9.1
-        name: Install FRRouting
+        name: Install and start FRRouting
         run: |
           curl -s https://deb.frrouting.org/frr/keys.gpg | sudo tee /usr/share/keyrings/frrouting.gpg > /dev/null
           echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt update && sudo apt install frr frr-pythontools
+          source /usr/lib/frr/frrcommon.sh
+          /usr/lib/frr/watchfrr $(daemon_list) &
       # Install dependencies from pip
       - name: Install dependencies from pip
         run: |
@@ -43,4 +45,4 @@ jobs:
       # Start the daemon
       - name: Start ecmp-manager daemon
         run: |
-          timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
+          sudo timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
