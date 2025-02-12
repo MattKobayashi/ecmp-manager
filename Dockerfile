@@ -16,6 +16,7 @@ RUN mkdir -p /var/log/ecmp-manager \
     && chown -R frr:frr /var/run/frr
 COPY . .
 RUN pip install --break-system-packages --no-cache-dir -r requirements.txt \
-    && chmod +x entrypoint.sh
+    && chmod +x entrypoint.sh \
+    && chmod +x entrypoint_test.sh
 
 CMD ["/app/entrypoint.sh"]

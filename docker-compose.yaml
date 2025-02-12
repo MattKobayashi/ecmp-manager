@@ -8,13 +8,12 @@ services:
       - NET_ADMIN
       - NET_RAW
       - SYS_ADMIN
+    entrypoint: ["/app/entrypoint_test.sh"]
     networks:
       ecmp_test_1:
         ipv4_address: 10.10.0.1
-        priority: 20
       ecmp_test_2:
         ipv4_address: 10.20.0.1
-        priority: 10
 networks:
   ecmp_test_1:
     ipam:
