@@ -1,12 +1,16 @@
 import toml
 from .interfaces import Interface, get_system_interfaces
 
-class Config:
+
+class Config: # Add a docstring to this class. AI!
     def __init__(self, interfaces):
         self.interfaces = interfaces
-        self.min_check_interval = min(iface.check_interval for iface in interfaces)
+        self.min_check_interval = min(
+            iface.check_interval for iface in interfaces
+        )
 
-def load_config():
+
+def load_config(): # Add a docstring to this function. AI!
     config_path = "config/config.toml"
     data = toml.load(config_path)
 
@@ -20,8 +24,16 @@ def load_config():
         
         if interface_name == "auto":
             # Validate auto configuration has all required parameters
-            if not all(k in iface_data for k in ("metric", "check_interval", "target_ip")):
-                raise ValueError("Auto configuration requires metric, check_interval, and target_ip")
+            if not all(
+                k in iface_data for k in (
+                    "metric",
+                    "check_interval",
+                    "target_ip"
+                )
+            ):
+                raise ValueError(
+                    "Auto configuration requires metric, check_interval, and target_ip"
+                )
             auto_params = iface_data
         else:
             # Existing interface processing
@@ -36,8 +48,10 @@ def load_config():
     if auto_params is not None:
         system_ifaces = get_system_interfaces()
         if not system_ifaces:
-            raise ValueError("Auto configuration specified but no system interfaces found")
-            
+            raise ValueError(
+                "Auto configuration specified but no system interfaces found"
+            )
+
         for iface_name in system_ifaces:
             # Skip interfaces already explicitly configured
             if not any(i.name == iface_name for i in interfaces):
