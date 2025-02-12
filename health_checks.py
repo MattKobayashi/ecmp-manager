@@ -46,6 +46,15 @@ def get_gateway_info(interface) -> Optional[tuple[str, str]]:
         return (None, None)
 
 
+def is_valid_ipv4(address: str) -> bool:
+    """Validate if a string is a valid IPv4 address."""
+    try:
+        ipaddress.IPv4Address(address)
+        return True
+    except ipaddress.AddressValueError:
+        return False
+
+
 def is_interface_healthy(
     interface,
     check_ip: str = None,
@@ -56,15 +65,6 @@ def is_interface_healthy(
     # Check interface state first
     if not os.path.exists(f'/sys/class/net/{interface.name}/operstate'):
         logger.debug("Interface %s does not exist", interface.name)
-        return False
-
-
-def is_valid_ipv4(address: str) -> bool:
-    """Validate if a string is a valid IPv4 address."""
-    try:
-        ipaddress.IPv4Address(address)
-        return True
-    except ipaddress.AddressValueError:
         return False
 
     with open(
