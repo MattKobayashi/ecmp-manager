@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import random
 import subprocess
 from typing import Optional
@@ -37,20 +38,35 @@ def get_default_gateway(interface: str) -> str:
 def get_next_hop_mac(interface) -> Optional[str]:
     """Resolve gateway IP to MAC address using ARP"""
     try:
+        # First check if interface exists and is up
+        if not os.path.exists(f'/sys/class/net/{interface.name}/operstate'):
+            logger.warning(f"Interface {interface.name} does not exist")
+            return None
+            
+        with open(f'/sys/class/net/{interface.name}/operstate') as f:
+            if f.read().strip() != 'up':
+                logger.warning(f"Interface {interface.name} is down")
+                return None
+
         logger.debug("Starting ARP resolution for %s", interface.name)
         gateway_ip = get_default_gateway(interface.name)
         logger.debug("Sending ARP broadcast for %s via %s", gateway_ip, interface.name)
+        
         ans, _ = scapy.srp(
             scapy.Ether(dst="ff:ff:ff:ff:ff:ff")/scapy.ARP(pdst=gateway_ip),
-            timeout=1,
+            timeout=2,
             verbose=0,
             iface=interface.name,
+            retry=1
         )
         if ans:
             logger.debug("ARP response received from %s (IP: %s)", ans[0][1].hwsrc, gateway_ip)
         else:
             logger.debug("No ARP response received within timeout period for %s", gateway_ip)
         return ans[0][1].hwsrc if ans else None
+    except OSError as e:
+        logger.warning(f"Network error on {interface.name}: {str(e)}")
+        return None
     except (Scapy_Exception, RuntimeError, ValueError, IndexError) as e:
         logger.debug("ARP exception details - Interface: %s, Gateway: %s", 
                     interface.name, locals().get('gateway_ip', 'Unknown'), 

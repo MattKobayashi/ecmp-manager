@@ -17,16 +17,20 @@ def main_loop():
     try:
         while True:
             for interface in config.interfaces:
-                logger.debug("Checking interface %s", interface.name)
-                if is_interface_healthy(
-                    interface,
-                    check_ip=interface.target_ip,
-                    check_port=80,
-                    timeout=1
-                ):
-                    frr.add_route(interface)
-                else:
-                    frr.remove_route(interface)
+                try:
+                    logger.debug("Checking interface %s", interface.name)
+                    if is_interface_healthy(
+                        interface,
+                        check_ip=interface.target_ip,
+                        check_port=80,
+                        timeout=1
+                    ):
+                        frr.add_route(interface)
+                    else:
+                        frr.remove_route(interface)
+                except Exception as e:
+                    logger.error(f"Interface check failed for {interface.name}: {str(e)}")
+                    continue  # Continue with next interface
             sleep(config.min_check_interval)
     except KeyboardInterrupt:
         logger.info("Received shutdown signal")
