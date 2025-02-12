@@ -1,9 +1,14 @@
-[interface.auto]
-check_interval = 10
-target_ip = "1.1.1.1"
-metric = 200
+# [interface.auto]
+# check_interval = 10
+# target_ip = "1.1.1.1"
+# metric = 200
 
-[interface.eth0]  # Explicit override example
+[interface.eth0]
 check_interval = 5
 target_ip = "1.1.1.1"
 metric = 100
+
+[interface.eth1]
+check_interval = 5
+target_ip = "1.1.1.1"
+metric = 200
