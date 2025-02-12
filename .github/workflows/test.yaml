@@ -27,10 +27,10 @@ jobs:
       # https://github.com/actions/checkout
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
-      # Install and start FRRouting
+      # Install and start FRR
       - env:
           FRRVER: frr-9.1
-        name: Install and start FRRouting
+        name: Install and start FRR
         run: |
           curl -s https://deb.frrouting.org/frr/keys.gpg | sudo tee /usr/share/keyrings/frrouting.gpg > /dev/null
           echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
@@ -47,6 +47,8 @@ jobs:
           sudo ip address show
           echo '---'
           sudo ip route show
+          echo '---'
+          sudo vtysh -c 'show ip route'
       # Start the daemon
       - continue-on-error: true
         name: Start ecmp-manager daemon
