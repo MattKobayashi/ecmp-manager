@@ -29,11 +29,19 @@ def main_loop():
                         try:
                             frr.add_route(interface, gateway_ip)
                         except Exception as e:
-                            logger.error("Route add failed for %s: %s", interface.name, str(e))
+                            logger.error(
+                                "Route add failed for %s: %s",
+                                interface.name,
+                                str(e)
+                            )
                     elif gateway_ip is not None:  # Only remove if we had a valid gateway
                         frr.remove_route(interface)
                 except Exception as e:
-                    logger.error("Interface check failed for %s: %s", interface.name, str(e))
+                    logger.error(
+                        "Interface check failed for %s: %s",
+                        interface.name,
+                        str(e)
+                    )
                     continue  # Continue with next interface
             sleep(config.min_check_interval)
     except KeyboardInterrupt:

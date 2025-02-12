@@ -73,7 +73,7 @@ def is_interface_healthy(
     ) as f:
         if f.read().strip() != 'up':
             logger.debug("Interface %s is down", interface.name)
-            return False, None
+            return (False, None)
 
     # Get gateway info from single source
     gateway_ip, dest_mac = get_gateway_info(interface)
