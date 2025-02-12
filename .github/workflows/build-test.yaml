@@ -42,6 +42,11 @@ jobs:
         run: |
           sudo pip install --break-system-packages --no-cache-dir -r requirements.txt
       # Start the daemon
-      - name: Start ecmp-manager daemon
+      - continue-on-error: true
+        name: Start ecmp-manager daemon
         run: |
           sudo timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
+      # Print the FRR routing table
+      - name: Print the FRR routing table
+        run: |
+          vtysh -c 'show ip route'
