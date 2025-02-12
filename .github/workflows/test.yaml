@@ -41,6 +41,11 @@ jobs:
       - name: Install dependencies from pip
         run: |
           sudo pip install --break-system-packages --no-cache-dir -r requirements.txt
+      # Print interface list
+      - name: Print interface list
+        run: |
+          sudo ip link show
+          sudo ip address show
       # Start the daemon
       - continue-on-error: true
         name: Start ecmp-manager daemon
