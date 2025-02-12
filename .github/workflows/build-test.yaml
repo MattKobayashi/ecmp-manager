@@ -25,10 +25,11 @@ jobs:
       - name: Build and start image
         run: |
           docker compose up --build --detach
-          docker compose exec ecmp-manager \
-            'apt-get update && apt-get --no-install-recommends --yes install iputils-ping && ping -c 5 1.1.1.1'
-      # Wait for container to start and run
-      - name: Wait for container to start and run
+          docker compose exec ecmp-manager apt-get update 
+          docker compose exec ecmp-manager apt-get --no-install-recommends --yes install iputils-ping
+          docker compose exec ecmp-manager ping -c 5 1.1.1.1
+      # Wait for container
+      - name: Wait for container
         run: |
           sleep 60
       # Grab the container logs
