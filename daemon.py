@@ -5,7 +5,7 @@ from health_checks import is_interface_healthy
 from config import load_config
 
 
-def main_loop():
+def main_loop():  # Add a docstring to this function. AI!
     # logging.config.fileConfig('logging.ini')
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(__name__)
