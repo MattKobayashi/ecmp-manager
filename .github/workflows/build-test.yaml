@@ -25,9 +25,6 @@ jobs:
       - name: Build and start image
         run: |
           docker compose up --build --detach
-          docker compose exec ${{ matrix.container }} apt-get update 
-          docker compose exec ${{ matrix.container }} apt-get --no-install-recommends --yes install iputils-ping
-          docker compose exec ${{ matrix.container }} ping -c 5 1.1.1.1
       # Wait for container
       - name: Wait for container
         run: |
