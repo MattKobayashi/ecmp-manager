@@ -28,10 +28,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
       # Install FRRouting
-      - name: Install FRRouting
+      - env:
+          FRRVER: frr-9.1
+        name: Install FRRouting
         run: |
           curl -s https://deb.frrouting.org/frr/keys.gpg | sudo tee /usr/share/keyrings/frrouting.gpg > /dev/null
-          FRRVER="frr-9.1" echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
+          echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt update && sudo apt install frr frr-pythontools
       # Install dependencies from pip
