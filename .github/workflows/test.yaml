@@ -1,0 +1,52 @@
+---
+name: Test ecmp-manager
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test ecmp-manager
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        container: [ecmp-manager]
+    steps:
+      # Set up Python 3.13
+      # https://github.com/actions/setup-python
+      - name: Set up Python
+        uses: actions/setup-python@v5.4.0
+        with:
+          python-version: "3.13"
+      # Checkout repository
+      # https://github.com/actions/checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
+      # Install and start FRRouting
+      - env:
+          FRRVER: frr-9.1
+        name: Install and start FRRouting
+        run: |
+          curl -s https://deb.frrouting.org/frr/keys.gpg | sudo tee /usr/share/keyrings/frrouting.gpg > /dev/null
+          echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
+            $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
+          sudo apt-get update && sudo apt-get install frr frr-pythontools
+          sudo systemctl start frr
+      # Install dependencies from pip
+      - name: Install dependencies from pip
+        run: |
+          sudo pip install --break-system-packages --no-cache-dir -r requirements.txt
+      # Start the daemon
+      - continue-on-error: true
+        name: Start ecmp-manager daemon
+        run: |
+          sudo timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
+      # Print the FRR routing table
+      - name: Print the FRR routing table
+        run: |
+          sudo vtysh -c 'show ip route'
