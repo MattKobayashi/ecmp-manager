@@ -60,7 +60,7 @@ def is_interface_healthy(
     check_ip: str = None,
     check_port: int = 80,
     timeout: int = 1
-) -> bool:
+) -> tuple[bool, Optional[str]]:
     """Forced TCP connectivity test via interface's gateway"""
     # Check interface state first
     if not os.path.exists(f'/sys/class/net/{interface.name}/operstate'):
@@ -73,7 +73,7 @@ def is_interface_healthy(
     ) as f:
         if f.read().strip() != 'up':
             logger.debug("Interface %s is down", interface.name)
-            return False
+            return False, None
 
     # Get gateway info from single source
     gateway_ip, dest_mac = get_gateway_info(interface)
@@ -122,7 +122,8 @@ def is_interface_healthy(
         return (
             response and
             response.haslayer(scapy.TCP) and
-            response[scapy.TCP].flags & 0x12 == 0x12  # SYN-ACK
+            response[scapy.TCP].flags & 0x12 == 0x12,  # SYN-ACK
+            gateway_ip
         )
     except (Scapy_Exception, AttributeError, IndexError) as e:
         logger.debug(

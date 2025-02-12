@@ -19,13 +19,17 @@ def main_loop():
             for interface in config.interfaces:
                 try:
                     logger.debug("Checking interface %s", interface.name)
-                    if is_interface_healthy(
+                    healthy, gateway_ip = is_interface_healthy(
                         interface,
                         check_ip=interface.target_ip,
                         check_port=80,
                         timeout=1
-                    ):
-                        frr.add_route(interface)
+                    )
+                    if healthy and gateway_ip:
+                        try:
+                            frr.add_route(interface, gateway_ip)
+                        except Exception as e:
+                            logger.error(f"Route add failed for {interface.name}: {str(e)}")
                     else:
                         frr.remove_route(interface)
                 except Exception as e:
