@@ -40,7 +40,7 @@ jobs:
       # Install dependencies from pip
       - name: Install dependencies from pip
         run: |
-          pip install --break-system-packages --no-cache-dir -r requirements.txt
+          sudo pip install --break-system-packages --no-cache-dir -r requirements.txt
       # Start the daemon
       - name: Start ecmp-manager daemon
         run: |
