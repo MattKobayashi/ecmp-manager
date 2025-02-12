@@ -4,6 +4,7 @@ import os
 import random
 import subprocess
 from typing import Optional
+import ipaddress
 import scapy.all as scapy
 from scapy.error import Scapy_Exception
 
@@ -25,7 +26,7 @@ def get_gateway_info(interface) -> Optional[tuple[str, str]]:
         # Find first IPv4 neighbour entry with valid MAC
         for entry in neighbours:
             dst_ip = entry.get("dst", "")
-            if scapy.utils.is_valid_ipv4(dst_ip) and entry.get("lladdr"):
+            if dst_ip and is_valid_ipv4(dst_ip) and entry.get("lladdr"):
                 logger.debug(
                     "Found gateway %s (%s) on %s",
                     dst_ip,
@@ -55,6 +56,15 @@ def is_interface_healthy(
     # Check interface state first
     if not os.path.exists(f'/sys/class/net/{interface.name}/operstate'):
         logger.debug("Interface %s does not exist", interface.name)
+        return False
+
+
+def is_valid_ipv4(address: str) -> bool:
+    """Validate if a string is a valid IPv4 address."""
+    try:
+        ipaddress.IPv4Address(address)
+        return True
+    except ipaddress.AddressValueError:
         return False
 
     with open(
