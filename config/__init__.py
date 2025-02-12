@@ -2,7 +2,14 @@ import toml
 from .interfaces import Interface, get_system_interfaces
 
 
-class Config: # Add a docstring to this class. AI!
+class Config:
+    """Represents the application's routing configuration.
+    
+    Attributes:
+        interfaces: List[Interface] - Network interfaces being monitored
+        min_check_interval: int - Smallest check interval from all interfaces
+                                  (automatically calculated)
+    """
     def __init__(self, interfaces):
         self.interfaces = interfaces
         self.min_check_interval = min(
