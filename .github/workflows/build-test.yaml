@@ -17,23 +17,28 @@ jobs:
       matrix:
         container: [ecmp-manager]
     steps:
+      # Set up Python 3.13
+      # https://github.com/actions/setup-python
+      - name: Set up Python
+        uses: actions/setup-python@v5.4.0
+        with:
+          python-version: "3.13"
       # Checkout repository
       # https://github.com/actions/checkout
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
-      # Build and start image
-      - name: Build and start image
+      # Install FRRouting
+      - name: Install FRRouting
         run: |
-          docker compose up --build --detach
-      # Wait for container
-      - name: Wait for container
+          curl -s https://deb.frrouting.org/frr/keys.gpg | sudo tee /usr/share/keyrings/frrouting.gpg > /dev/null
+          FRRVER="frr-9.1" echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
+            $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
+          sudo apt update && sudo apt install frr frr-pythontools
+      # Install dependencies from pip
+      - name: Install dependencies from pip
         run: |
-          sleep 60
-      # Grab the container logs
-      - name: Grab container logs
+          pip install --break-system-packages --no-cache-dir -r requirements.txt
+      # Start the daemon
+      - name: Start ecmp-manager daemon
         run: |
-          docker compose logs ${{ matrix.container }}
-      # Stop and remove containers
-      - name: Stop and remove container
-        run: |
-          docker compose down
+          timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
