@@ -44,8 +44,6 @@ jobs:
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
-          sudo ip link show
-          echo '---'
           sudo ip address show
           echo '---'
           sudo ip route show
