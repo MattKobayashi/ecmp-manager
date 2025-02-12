@@ -36,8 +36,7 @@ jobs:
           echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt update && sudo apt install frr frr-pythontools
-          source /usr/lib/frr/frrcommon.sh
-          /usr/lib/frr/watchfrr $(daemon_list) &
+          sudo systemctl start frr
       # Install dependencies from pip
       - name: Install dependencies from pip
         run: |
