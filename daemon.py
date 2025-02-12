@@ -24,7 +24,6 @@ def main_loop() -> None:
         SystemExit: On unrecoverable configuration or routing errors
     """
 
-    # logging.config.fileConfig('logging.ini')
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(__name__)
     logger.info("Starting ECMP Manager daemon")
