@@ -4,12 +4,13 @@ from .interfaces import Interface, get_system_interfaces
 
 class Config:
     """Represents the application's routing configuration.
-    
+
     Attributes:
         interfaces: List[Interface] - Network interfaces being monitored
         min_check_interval: int - Smallest check interval from all interfaces
                                   (automatically calculated)
     """
+
     def __init__(self, interfaces):
         self.interfaces = interfaces
         self.min_check_interval = min(
@@ -28,7 +29,7 @@ def load_config(): # Add a docstring to this function. AI!
     # Process configuration entries
     for interface_name in interface_data:
         iface_data = interface_data[interface_name]
-        
+
         if interface_name == "auto":
             # Validate auto configuration has all required parameters
             if not all(
