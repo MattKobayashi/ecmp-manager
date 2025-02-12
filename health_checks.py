@@ -52,7 +52,7 @@ def is_valid_ipv4(address: str) -> bool:
         ipaddress.IPv4Address(address)
         return True
     except ipaddress.AddressValueError:
-        return False
+        return (False, None)
 
 
 def is_interface_healthy(
@@ -65,7 +65,7 @@ def is_interface_healthy(
     # Check interface state first
     if not os.path.exists(f'/sys/class/net/{interface.name}/operstate'):
         logger.debug("Interface %s does not exist", interface.name)
-        return False
+        return (False, None)
 
     with open(
         f'/sys/class/net/{interface.name}/operstate',
@@ -80,7 +80,7 @@ def is_interface_healthy(
 
     if not all([gateway_ip, dest_mac]):
         logger.debug("No valid gateway info for %s", interface.name)
-        return False
+        return (False, None)
 
     if check_ip is None:
         check_ip = interface.target_ip
