@@ -25,9 +25,9 @@ jobs:
       - name: Build and start image
         run: |
           docker compose up --build --detach
-          docker compose exec ecmp-manager apt-get update 
-          docker compose exec ecmp-manager apt-get --no-install-recommends --yes install iputils-ping
-          docker compose exec ecmp-manager ping -c 5 1.1.1.1
+          docker compose exec ${{ matrix.container }} apt-get update 
+          docker compose exec ${{ matrix.container }} apt-get --no-install-recommends --yes install iputils-ping
+          docker compose exec ${{ matrix.container }} ping -c 5 1.1.1.1
       # Wait for container
       - name: Wait for container
         run: |
@@ -35,7 +35,7 @@ jobs:
       # Grab the container logs
       - name: Grab container logs
         run: |
-          docker compose logs ecmp-manager
+          docker compose logs ${{ matrix.container }}
       # Stop and remove containers
       - name: Stop and remove container
         run: |
