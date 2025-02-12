@@ -30,7 +30,7 @@ def main_loop():
                             frr.add_route(interface, gateway_ip)
                         except Exception as e:
                             logger.error(f"Route add failed for {interface.name}: {str(e)}")
-                    else:
+                    else:  # This should only run if gateway_ip != None. AI!
                         frr.remove_route(interface)
                 except Exception as e:
                     logger.error(f"Interface check failed for {interface.name}: {str(e)}")
