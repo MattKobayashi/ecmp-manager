@@ -17,12 +17,6 @@ jobs:
       matrix:
         container: [ecmp-manager]
     steps:
-      # Set up Python 3.13
-      # https://github.com/actions/setup-python
-      - name: Set up Python
-        uses: actions/setup-python@v5.4.0
-        with:
-          python-version: "3.13"
       # Checkout repository
       # https://github.com/actions/checkout
       - name: Checkout repository
@@ -54,7 +48,7 @@ jobs:
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
-          sudo setcap cap_net_raw=eip $(which python3)
+          sudo setcap CAP_NET_RAW=eip $(readlink -f $(poetry run which python3))
           timeout --kill-after=30s --preserve-status 30s poetry run ecmp-manager
       # Print the FRR routing table
       - name: Print the FRR routing table
