@@ -9,9 +9,6 @@ on:
 
 jobs:
   test:
-    defaults:
-      run:
-        shell: bash
     name: Test ecmp-manager
     runs-on: ubuntu-24.04
     strategy:
@@ -39,15 +36,14 @@ jobs:
           echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt-get update && sudo apt-get install frr frr-pythontools
-          sudo adduser $(whoami) frrvty
           sudo gpasswd -r frrvty
+          sudo adduser $(whoami) frrvty
           sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr  # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
           sudo systemctl start frr
           sudo chown frr:frrvty /etc/frr/vtysh.conf
       # Check FRR status
       - name: Check FRR status
         run: |
-          newgrp frrvty
           id
           sudo journalctl --no-pager -xu frr
           vtysh -b
@@ -58,7 +54,7 @@ jobs:
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
-          newgrp frrvty
+          id
           sudo ip address show
           echo '---'
           sudo ip route show
@@ -68,7 +64,7 @@ jobs:
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
-          newgrp frrvty
+          id
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
           poetry install
           poetry run python3 -u daemon.py
@@ -76,5 +72,5 @@ jobs:
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
-          newgrp frrvty
+          id
           vtysh -c 'show ip route'
