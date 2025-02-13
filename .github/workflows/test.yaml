@@ -40,7 +40,7 @@ jobs:
           sudo adduser $(whoami) frrvty
           sudo chown frr:frrvty /etc/frr/vtysh.conf
           sudo journalctl --no-pager -xu frr
-          sudo vtysh -b
+          vtysh -b
       # Set up Poetry
       - name: Set up Poetry
         run: |
