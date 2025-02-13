@@ -27,26 +27,26 @@ jobs:
       # https://github.com/actions/checkout
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
-      # Install and start FRR
+      # Set up and start FRR
       - env:
           FRRVER: frr-9.1
-        name: Install and start FRR
+        name: Set up and start FRR
         run: |
           curl -s https://deb.frrouting.org/frr/keys.gpg | sudo tee /usr/share/keyrings/frrouting.gpg > /dev/null
           echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt-get update && sudo apt-get install frr frr-pythontools
-          sudo systemctl start frr
           sudo adduser $(whoami) frrvty
           sudo gpasswd -r frrvty
           sudo chown frr:frrvty /etc/frr/vtysh.conf
           sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr  # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
+          sudo systemctl start frr
+          sleep 5
           sudo journalctl --no-pager -xu frr
       # Set up Poetry
       - name: Set up Poetry
         run: |
           sudo apt-get --no-install-recommends --yes install python3-poetry
-          poetry install
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
@@ -60,6 +60,7 @@ jobs:
         name: Start ecmp-manager daemon
         run: |
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
+          sg frrvty -c "poetry install"
           sg frrvty -c "poetry run ecmp-manager"
         timeout-minutes: 1
       # Print the FRR routing table
