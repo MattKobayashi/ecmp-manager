@@ -41,7 +41,7 @@ jobs:
       - name: Set up Poetry
         run: |
           sudo apt-get --no-install-recommends --yes install python3-poetry
-          sudo poetry install
+          poetry install
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
@@ -54,7 +54,7 @@ jobs:
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
-          sudo poetry run timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
+          poetry run timeout --kill-after=30s --preserve-status 30s sudo python3 -u daemon.py
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
