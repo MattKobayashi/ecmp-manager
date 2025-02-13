@@ -41,6 +41,7 @@ jobs:
           sudo systemctl start frr
           sudo gpasswd -r frrvty
           sudo adduser $(whoami) frrvty
+          sudo chown frrvty:frr /etc/frr/vtysh.conf
       # Check FRR status
       - name: Check FRR status
         run: |
