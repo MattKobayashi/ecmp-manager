@@ -47,6 +47,7 @@ jobs:
       # Check FRR status
       - name: Check FRR status
         run: |
+          newgrp frrvty
           sudo journalctl --no-pager -xu frr
           vtysh -b
       # Set up Poetry
@@ -56,6 +57,7 @@ jobs:
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
+          newgrp frrvty
           sudo ip address show
           echo '---'
           sudo ip route show
@@ -65,6 +67,7 @@ jobs:
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
+          newgrp frrvty
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
           poetry install
           poetry run python3 -u daemon.py
@@ -72,4 +75,5 @@ jobs:
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
+          newgrp frrvty
           vtysh -c 'show ip route'
