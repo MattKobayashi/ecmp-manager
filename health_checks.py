@@ -52,7 +52,7 @@ def is_valid_ipv4(address: str) -> bool:
         ipaddress.IPv4Address(address)
         return True
     except ipaddress.AddressValueError:
-        return (False, None)
+        return False
 
 
 def is_interface_healthy(
