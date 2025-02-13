@@ -38,17 +38,13 @@ jobs:
           sudo apt-get update && sudo apt-get install frr frr-pythontools
           # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
           sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr
-          sudo gpasswd -r frr
-          sudo adduser $(whoami) frr
+          sudo systemctl start frr
           sudo gpasswd -r frrvty
           sudo adduser $(whoami) frrvty
-          sudo chown frr:frrvty /etc/frr/vtysh.conf
-          sudo systemctl start frr
       # Check FRR status
       - name: Check FRR status
         run: |
           sudo journalctl --no-pager -xu frr
-          sg frr -c "vtysh -b"
       # Set up Poetry
       - name: Set up Poetry
         run: |
