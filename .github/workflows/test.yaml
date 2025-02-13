@@ -37,10 +37,11 @@ jobs:
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt-get update && sudo apt-get install frr frr-pythontools
           sudo systemctl start frr
-      # Install dependencies from pip
-      - name: Install dependencies from pip
+      # Set up Poetry
+      - name: Set up Poetry
         run: |
-          sudo pip install --break-system-packages --no-cache-dir -r requirements.txt
+          sudo apt-get --no-install-recommends --yes install python3-poetry
+          poetry install
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
@@ -53,7 +54,7 @@ jobs:
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
-          sudo timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
+          sudo timeout --kill-after=30s --preserve-status 30s poetry run python3 -u daemon.py
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
