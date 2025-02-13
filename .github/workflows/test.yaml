@@ -38,8 +38,8 @@ jobs:
           sudo apt-get update && sudo apt-get install frr frr-pythontools
           sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr  # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
           sudo gpasswd -r frrvty
+          sudo adduser $(whoami) frr
           sudo adduser $(whoami) frrvty
-          sudo chown frr:frrvty /etc/frr/frr.conf
           sudo chown frr:frrvty /etc/frr/vtysh.conf
           sudo systemctl start frr
       # Check FRR status
