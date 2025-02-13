@@ -38,10 +38,9 @@ jobs:
           sudo apt-get update && sudo apt-get install frr frr-pythontools
           sudo systemctl start frr
           sudo adduser $(whoami) frrvty
-          sudo chown frr:frrvty /etc/frr
-          sudo chmod 0775 /etc/frr
           sudo chown frr:frrvty /etc/frr/vtysh.conf
           sudo journalctl --no-pager -xu frr
+          sudo ls -hal /etc/frr
           sudo ls -hal /var/run/frr
       # Set up Poetry
       - name: Set up Poetry
