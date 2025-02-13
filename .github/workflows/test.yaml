@@ -55,7 +55,7 @@ jobs:
         name: Start ecmp-manager daemon
         run: |
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
-          timeout --kill-after=30s --preserve-status 30s poetry run ecmp-manager
+          poetry run timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
