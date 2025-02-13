@@ -7,6 +7,21 @@ logger = logging.getLogger(__name__)
 class FRRClient:
     def __init__(self):
         self.installed_routes = {}  # Interface → (gateway_ip, metric)
+        if not self.check_frr_running():
+            raise RuntimeError("Failed to connect to FRRouting service")
+
+    def check_frr_running(self) -> bool:
+        """Verify FRR is operational by checking version command"""
+        try:
+            self._execute_vty_command("show version") 
+            logger.info("FRR connection validated")
+            return True
+        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+            logger.error(
+                "FRR connection failed - Is FRR installed and running? Error: %s", 
+                str(e)
+            )
+            return False
 
     def _execute_vty_command(self, command):
         """Log vtysh command execution details"""

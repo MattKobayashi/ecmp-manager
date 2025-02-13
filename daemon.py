@@ -1,4 +1,5 @@
 import logging
+import sys
 from time import sleep
 from frr import FRRClient
 from health_checks import is_interface_healthy
@@ -29,7 +30,13 @@ def main_loop() -> None:
     logger.info("Starting ECMP Manager daemon")
 
     config = load_config()
-    frr = FRRClient()
+    
+    try:
+        frr = FRRClient()
+    except RuntimeError as e:
+        logger.critical("FRRouting service unavailable: %s", e)
+        logger.critical("Verify FRR is installed and vtysh is in PATH")
+        sys.exit(1)
 
     try:
         while True:
