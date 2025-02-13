@@ -43,7 +43,7 @@ jobs:
       # Set up ecmpmgr user
       - name: Set up ecmpmgr user
         run: |
-          sudo adduser --disabled-password ecmpmgr
+          sudo adduser --disabled-password --gecos '' ecmpmgr
           sudo adduser ecmpmgr frrvty
       # Check FRR status
       - name: Check FRR status
