@@ -36,9 +36,10 @@ jobs:
           echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt-get update && sudo apt-get install frr frr-pythontools
-          sudo gpasswd -r frrvty
           sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr  # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
           sudo systemctl start frr
+          sudo gpasswd -r frrvty
+          sudo adduser $(whoami) frrvty
           sudo chown frr:frrvty /etc/frr/vtysh.conf
       # Check FRR status
       - name: Check FRR status
