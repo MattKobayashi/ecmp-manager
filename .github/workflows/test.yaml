@@ -17,6 +17,12 @@ jobs:
       matrix:
         container: [ecmp-manager]
     steps:
+      # Set up Python 3.13
+      # https://github.com/actions/setup-python
+      - name: Set up Python
+        uses: actions/setup-python@v5.4.0
+        with:
+          python-version: "3.13"
       # Checkout repository
       # https://github.com/actions/checkout
       - name: Checkout repository
