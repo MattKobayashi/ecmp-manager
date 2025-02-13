@@ -40,6 +40,7 @@ jobs:
           sudo adduser $(whoami) frrvty
           sudo gpasswd -r frrvty
           sudo chown frr:frrvty /etc/frr/vtysh.conf
+          sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr  # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
           sudo journalctl --no-pager -xu frr
       # Set up Poetry
       - name: Set up Poetry
