@@ -54,7 +54,8 @@ jobs:
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
-          poetry run timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
+          sudo setcap cap_net_raw=eip python3
+          timeout --kill-after=30s --preserve-status 30s poetry run ecmp-manager
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |

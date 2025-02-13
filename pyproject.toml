@@ -12,6 +12,9 @@ toml = "0.10.2"
 
 [tool.poetry.group.dev.dependencies]
 
+[tool.poetry.scripts]
+ecmp-manager = "daemon:main_loop"
+
 [build-system]
 requires = ["poetry-core==2.0.1"]
 build-backend = "poetry.core.masonry.api"
