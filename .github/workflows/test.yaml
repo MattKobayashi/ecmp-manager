@@ -36,8 +36,7 @@ jobs:
           echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt-get update && sudo apt-get install frr frr-pythontools
-          # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
-          sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr
+          sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr  # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
           sudo systemctl start frr
           sudo gpasswd -r frrvty
           sudo adduser $(whoami) frrvty
@@ -58,8 +57,6 @@ jobs:
           sudo ip address show
           echo '---'
           sudo ip route show
-          echo '---'
-          sudo ls -hal /etc/frr
           echo '---'
           sg frrvty -c "vtysh -c 'show ip route'"
       # Start the daemon
