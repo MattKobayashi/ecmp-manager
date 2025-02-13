@@ -39,6 +39,7 @@ jobs:
           sudo systemctl start frr
           sudo adduser $(whoami) frrvty
           sudo chown frr:frrvty /etc/frr/vtysh.conf
+          sudo chmod g+w /etc/frr/vtysh.conf
           sudo journalctl --no-pager -xu frr
       # Set up Poetry
       - name: Set up Poetry
@@ -48,7 +49,6 @@ jobs:
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
-          id $(whoami)
           sudo ip address show
           echo '---'
           sudo ip route show
