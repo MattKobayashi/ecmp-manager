@@ -41,12 +41,12 @@ jobs:
           sudo systemctl start frr
           sudo gpasswd -r frrvty
           sudo adduser $(whoami) frrvty
-          sudo chown frr:frrvty /etc/frr/vtysh.conf
-          sudo chmod 0660 /etc/frr/vtysh.conf
+          sudo chown frr:frrvty /etc/frr
       # Check FRR status
       - name: Check FRR status
         run: |
           sudo journalctl --no-pager -xu frr
+          sg frrvty -c "vtysh -c 'write integrated'"
       # Set up Poetry
       - name: Set up Poetry
         run: |
