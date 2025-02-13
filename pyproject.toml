@@ -1,3 +1,6 @@
+[project]
+requires-python = "=3.13"
+
 [tool.poetry]
 name = "ecmp-manager"
 version = "1.0.0"
