@@ -27,20 +27,30 @@ jobs:
       # https://github.com/actions/checkout
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
-      # Install and start FRR
+      # Set up and start FRR
       - env:
           FRRVER: frr-9.1
-        name: Install and start FRR
+        name: Set up and start FRR
         run: |
           curl -s https://deb.frrouting.org/frr/keys.gpg | sudo tee /usr/share/keyrings/frrouting.gpg > /dev/null
           echo deb '[signed-by=/usr/share/keyrings/frrouting.gpg]' https://deb.frrouting.org/frr \
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt-get update && sudo apt-get install frr frr-pythontools
+          sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr  # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
           sudo systemctl start frr
-      # Install dependencies from pip
-      - name: Install dependencies from pip
+          sudo gpasswd -r frrvty
+          sudo adduser $(whoami) frrvty
+          sudo chown frr:frrvty /etc/frr
+          sudo chmod 0775 /etc/frr
+          sudo chown frr:frrvty /etc/frr/vtysh.conf
+      # Check FRR status
+      - name: Check FRR status
         run: |
-          sudo pip install --break-system-packages --no-cache-dir -r requirements.txt
+          sudo journalctl --no-pager -xu frr
+      # Set up Poetry
+      - name: Set up Poetry
+        run: |
+          sudo apt-get --no-install-recommends --yes install python3-poetry
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
@@ -48,13 +58,16 @@ jobs:
           echo '---'
           sudo ip route show
           echo '---'
-          sudo vtysh -c 'show ip route'
+          sg frrvty -c "vtysh -c 'show ip route'"
       # Start the daemon
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
-          sudo timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
+          sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
+          poetry install
+          sg frrvty -c "poetry run python3 -u daemon.py"
+        timeout-minutes: 1
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
-          sudo vtysh -c 'show ip route'
+          sg frrvty -c "vtysh -c 'show ip route'"
