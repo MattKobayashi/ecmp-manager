@@ -9,6 +9,9 @@ on:
 
 jobs:
   test:
+    defaults:
+      run:
+        shell: bash
     name: Test ecmp-manager
     runs-on: ubuntu-24.04
     strategy:
@@ -40,9 +43,11 @@ jobs:
           sudo gpasswd -r frrvty
           sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr  # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
           sudo systemctl start frr
+          sudo chown frr:frrvty /etc/frr/vtysh.conf
           sleep 5
+          newgrp frrvty
           sudo journalctl --no-pager -xu frr
-          sg frrvty -c "vtysh -b"
+          vtysh -b
       # Set up Poetry
       - name: Set up Poetry
         run: |
@@ -54,16 +59,16 @@ jobs:
           echo '---'
           sudo ip route show
           echo '---'
-          sg frrvty -c "vtysh -c 'show ip route'"
+          vtysh -c 'show ip route'
       # Start the daemon
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
           poetry install
-          sg frrvty -c "poetry run python3 -u daemon.py"
+          poetry run python3 -u daemon.py
         timeout-minutes: 1
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
-          sg frrvty -c "vtysh -c 'show ip route'"
+          vtysh -c 'show ip route'
