@@ -48,9 +48,8 @@ jobs:
       # Check FRR status
       - name: Check FRR status
         run: |
-          sudo -iu ecmpmgr
           sudo journalctl --no-pager -xu frr
-          vtysh -b
+          sudo -u ecmpmgr -s "vtysh -b"
       # Set up Poetry
       - name: Set up Poetry
         run: |
@@ -58,23 +57,20 @@ jobs:
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
-          sudo -iu ecmpmgr
           sudo ip address show
           echo '---'
           sudo ip route show
           echo '---'
-          vtysh -c 'show ip route'
+          sudo -u ecmpmgr -s "vtysh -c 'show ip route'"
       # Start the daemon
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
-          sudo -iu ecmpmgr
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
           poetry install
-          poetry run python3 -u daemon.py
+          sudo -u ecmpmgr -s "poetry run python3 -u daemon.py"
         timeout-minutes: 1
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
-          sudo -iu ecmpmgr
-          vtysh -c 'show ip route'
+          sudo -u ecmpmgr -s "vtysh -c 'show ip route'"
