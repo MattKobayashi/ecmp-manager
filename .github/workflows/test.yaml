@@ -53,14 +53,14 @@ jobs:
           echo '---'
           sudo ip route show
           echo '---'
-          sg frrvty vtysh -c 'show ip route'
+          sg frrvty -c "vtysh -c 'show ip route'"
       # Start the daemon
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
-          sg frrvty poetry run timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
+          sg frrvty -c "poetry run timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py"
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
-          sg frrvty vtysh -c 'show ip route'
+          sg frrvty -c "vtysh -c 'show ip route'"
