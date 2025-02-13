@@ -40,7 +40,6 @@ jobs:
           sudo adduser $(whoami) frrvty
           sudo adduser $(whoami) frr
           sudo journalctl --no-pager -xu frr
-          id $(whoami)
       # Set up Poetry
       - name: Set up Poetry
         run: |
@@ -49,6 +48,7 @@ jobs:
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
+          id $(whoami)
           sudo ip address show
           echo '---'
           sudo ip route show
