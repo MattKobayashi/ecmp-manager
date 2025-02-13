@@ -1,24 +1,23 @@
-# Network Interface Management Daemon
+# ecmp-manager
 
-Dynamic routing daemon that monitors interface health and manages FRR (FRRouting) default routes.
+Multi-WAN ECMP and failover for FRRouting.
 
 ## Features
 
-- Interface health monitoring with configurable checks
-- Automatic failover using FRRouting (FRR)
-- TOML configuration for interface priority and check parameters
-- Docker container support with health checks
+- Multi-WAN health monitoring with configurable checks
+- ECMP and failover using FRRouting (FRR)
+- TOML configuration for interface and check parameters
 - Route persistence tracking and cleanup
 
 ## Installation
 
 ```bash
 # Install Poetry if not already present
-curl -sSL https://install.python-poetry.org | python3 -
+sudo apt install python3-poetry
 
 # Clone and setup
-git clone https://github.com/yourusername/network-daemon.git
-cd network-daemon
+git clone https://github.com/MattKobayashi/ecmp-manager.git
+cd ecmp-manager
 poetry install
 ```
 
@@ -34,26 +33,21 @@ metric = 100          # Lower metrics have priority
 
 [interface.eth1]
 check_interval = 5
-target_ip = "8.8.8.8" 
+target_ip = "8.8.8.8"
 metric = 200
 ```
 
 Requirements:
-- Interface names must match system interfaces (`ip link show`)
-- Valid IP addresses for `target_ip`
-- Metric values between 1-255
 
-## FRR Requirements
-```bash
-# Ubuntu/Debian example
-sudo apt install frr
-sudo usermod -aG frr $USER
-sudo sysctl -w net.ipv4.ip_forward=1
-```
+- FRRouting must already be installed and working on the system
+- Interface names must match system interfaces (`ip link show`)
+- Valid IP address for `target_ip` that allows connections to TCP port 80
+- Metric values between 1-255
 
 ## Usage
 
 ### Local Execution
+
 ```bash
 # Start daemon in background
 poetry run python -m daemon
@@ -62,13 +56,8 @@ poetry run python -m daemon
 poetry run python -m daemon --foreground
 ```
 
-### Docker
-```bash
-docker-compose build --no-cache
-docker-compose up -d
-```
-
 ### Verify Routes
+
 ```bash
 vtysh -c "show ip route"
 ```
@@ -76,18 +65,17 @@ vtysh -c "show ip route"
 ## Troubleshooting
 
 Common Issues:
+
 - `vtysh` not in PATH or permissions issues
 - Interface names in config don't match system interfaces
 - FRR not running/installed
 - Missing health check target IP connectivity
 
 ```bash
-# Check daemon logs
-journalctl -u your-service-name
-
 # Validate FRR connectivity
 vtysh -c "show running-config"
 ```
 
 ## License
-MIT License - See [LICENSE](LICENSE)
+
+See [LICENSE](LICENSE)
