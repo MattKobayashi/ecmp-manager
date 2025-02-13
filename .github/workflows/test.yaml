@@ -51,7 +51,7 @@ jobs:
           echo '---'
           sudo ip route show
           echo '---'
-          sudo vtysh -c 'show ip route'
+          vtysh -c 'show ip route'
       # Start the daemon
       - continue-on-error: true
         name: Start ecmp-manager daemon
@@ -61,4 +61,4 @@ jobs:
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
-          sudo vtysh -c 'show ip route'
+          vtysh -c 'show ip route'
