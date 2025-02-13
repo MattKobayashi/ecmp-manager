@@ -60,8 +60,8 @@ jobs:
         name: Start ecmp-manager daemon
         run: |
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
-          sg frrvty -c "poetry install"
-          sg frrvty -c "poetry run ecmp-manager"
+          poetry install
+          sg frrvty -c "poetry run python3 -u daemon.py"
         timeout-minutes: 1
       # Print the FRR routing table
       - name: Print the FRR routing table
