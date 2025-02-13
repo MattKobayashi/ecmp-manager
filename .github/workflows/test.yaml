@@ -37,10 +37,8 @@ jobs:
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt-get update && sudo apt-get install frr frr-pythontools
           sudo systemctl start frr
-          sudo adduser $(whoami) frrvty
           sudo chown frr:frrvty /etc/frr/vtysh.conf
           sudo journalctl --no-pager -xu frr
-          vtysh -b
       # Set up Poetry
       - name: Set up Poetry
         run: |
@@ -53,14 +51,14 @@ jobs:
           echo '---'
           sudo ip route show
           echo '---'
-          vtysh -c 'show ip route'
+          sg frrvty vtysh -c 'show ip route'
       # Start the daemon
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
-          poetry run timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
+          sg frrvty poetry run timeout --kill-after=30s --preserve-status 30s python3 -u daemon.py
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
-          vtysh -c 'show ip route'
+          sg frrvty vtysh -c 'show ip route'
