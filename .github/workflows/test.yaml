@@ -48,6 +48,7 @@ jobs:
       - name: Check FRR status
         run: |
           newgrp frrvty
+          id
           sudo journalctl --no-pager -xu frr
           vtysh -b
       # Set up Poetry
