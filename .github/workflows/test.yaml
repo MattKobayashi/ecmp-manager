@@ -41,7 +41,7 @@ jobs:
       - name: Set up Poetry
         run: |
           sudo apt-get --no-install-recommends --yes install python3-poetry
-          poetry install
+          sudo poetry install
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
