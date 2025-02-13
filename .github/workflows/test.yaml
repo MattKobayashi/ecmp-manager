@@ -43,7 +43,8 @@ jobs:
       # Set up ecmpmgr user
       - name: Set up ecmpmgr user
         run: |
-          sudo adduser -D --groups frrvty ecmpmgr
+          sudo adduser --disabled-password ecmpmgr
+          sudo adduser ecmpmgr frrvty
       # Check FRR status
       - name: Check FRR status
         run: |
