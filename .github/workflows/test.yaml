@@ -37,13 +37,14 @@ jobs:
             $(lsb_release -s -c) $FRRVER | sudo tee -a /etc/apt/sources.list.d/frr.list
           sudo apt-get update && sudo apt-get install frr frr-pythontools
           sudo gpasswd -r frrvty
-          sudo adduser $(whoami) frrvty
           sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr  # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
           sudo systemctl start frr
           sudo chown frr:frrvty /etc/frr/vtysh.conf
       # Check FRR status
       - name: Check FRR status
         run: |
+          sudo adduser $(whoami) frrvty
+          newgrp frrvty
           id
           sudo journalctl --no-pager -xu frr
           vtysh -b
@@ -54,6 +55,8 @@ jobs:
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
+          sudo adduser $(whoami) frrvty
+          newgrp frrvty
           id
           sudo ip address show
           echo '---'
@@ -64,6 +67,8 @@ jobs:
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
+          sudo adduser $(whoami) frrvty
+          newgrp frrvty
           id
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
           poetry install
@@ -72,5 +77,7 @@ jobs:
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
+          sudo adduser $(whoami) frrvty
+          newgrp frrvty
           id
           vtysh -c 'show ip route'
