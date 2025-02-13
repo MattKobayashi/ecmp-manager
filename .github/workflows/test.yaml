@@ -40,16 +40,11 @@ jobs:
           sudo sed -i 's/pam_rootok/pam_permit/' /etc/pam.d/frr  # https://github.com/FRRouting/frr/discussions/14745#discussioncomment-8266899
           sudo systemctl start frr
           sudo chown frr:frrvty /etc/frr/vtysh.conf
-      # Set up ecmpmgr user
-      - name: Set up ecmpmgr user
-        run: |
-          sudo adduser --disabled-password --gecos '' ecmpmgr
-          sudo adduser ecmpmgr frrvty
       # Check FRR status
       - name: Check FRR status
         run: |
           sudo journalctl --no-pager -xu frr
-          sudo -u ecmpmgr -s "vtysh -b"
+          sg frrvty vtysh -b
       # Set up Poetry
       - name: Set up Poetry
         run: |
@@ -61,16 +56,16 @@ jobs:
           echo '---'
           sudo ip route show
           echo '---'
-          sudo -u ecmpmgr -s "vtysh -c 'show ip route'"
+          sg frrvty vtysh -c 'show ip route'
       # Start the daemon
       - continue-on-error: true
         name: Start ecmp-manager daemon
         run: |
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
           poetry install
-          sudo -u ecmpmgr -s "poetry run python3 -u daemon.py"
+          sg frrvty poetry run python3 -u daemon.py
         timeout-minutes: 1
       # Print the FRR routing table
       - name: Print the FRR routing table
         run: |
-          sudo -u ecmpmgr -s "vtysh -c 'show ip route'"
+          sg frrvty vtysh -c 'show ip route'
