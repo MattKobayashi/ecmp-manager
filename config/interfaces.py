@@ -1,3 +1,8 @@
+# /// script
+# requires-python = ">=3.13"
+# dependencies = []
+# ///
+
 import os
 
 
@@ -20,3 +25,4 @@ def get_system_interfaces():
         return [iface for iface in os.listdir(net_dir) 
                 if iface != 'lo' and not iface.startswith('veth')]
     return []
+

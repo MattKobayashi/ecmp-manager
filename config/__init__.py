@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "toml==0.10.2",
+# ]
+# ///
+
 import toml
 from .interfaces import Interface, get_system_interfaces
 
@@ -91,3 +98,4 @@ def load_config():
         raise ValueError("No interfaces defined in config.toml")
 
     return Config(interfaces)
+

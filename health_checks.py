@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "scapy==2.6.1",
+# ]
+# ///
+
 import json
 import logging
 import os
@@ -136,3 +143,4 @@ def is_interface_healthy(
             str(e)
         )
         return False
+

@@ -50,10 +50,10 @@ Requirements:
 
 ```bash
 # Start daemon in background
-poetry run python -m daemon
+uv run python -m daemon
 
 # Foreground mode with debug output
-poetry run python -m daemon --foreground
+uv run python -m daemon --foreground
 ```
 
 ### Verify Routes

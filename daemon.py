@@ -1,3 +1,11 @@
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "scapy==2.6.1",
+#     "toml==0.10.2",
+# ]
+# ///
+
 import logging
 import sys
 from time import sleep
@@ -77,3 +85,4 @@ def main_loop() -> None:
 
 if __name__ == "__main__":
     main_loop()
+
