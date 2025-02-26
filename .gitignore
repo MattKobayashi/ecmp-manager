@@ -14,3 +14,5 @@ Cargo.lock
 *.pdb
 .aider*
 poetry.lock
+uv.lock
+.python-version

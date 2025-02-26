@@ -143,4 +143,3 @@ def is_interface_healthy(
             str(e)
         )
         return False
-

@@ -78,4 +78,3 @@ class FRRClient:
             f"no ip route 0.0.0.0/0 {gateway_ip} {metric}"
         )
         logger.debug("Route successfully removed for %s", interface.name)
-

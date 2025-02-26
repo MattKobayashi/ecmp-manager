@@ -98,4 +98,3 @@ def load_config():
         raise ValueError("No interfaces defined in config.toml")
 
     return Config(interfaces)
-

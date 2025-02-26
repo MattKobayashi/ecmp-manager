@@ -25,4 +25,3 @@ def get_system_interfaces():
         return [iface for iface in os.listdir(net_dir) 
                 if iface != 'lo' and not iface.startswith('veth')]
     return []
-
