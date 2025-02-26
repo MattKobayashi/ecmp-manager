@@ -12,13 +12,16 @@ Multi-WAN ECMP and failover for FRRouting.
 ## Installation
 
 ```bash
-# Install Poetry if not already present
-sudo apt install python3-poetry
+# Install pipx if not already present
+sudo apt install pipx
+pipx ensurepath
+
+# Install uv
+pipx install uv
 
 # Clone and setup
 git clone https://github.com/MattKobayashi/ecmp-manager.git
 cd ecmp-manager
-poetry install
 ```
 
 ## Configuration
