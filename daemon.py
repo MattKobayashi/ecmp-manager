@@ -1,3 +1,11 @@
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "scapy==2.6.1",
+#     "toml==0.10.2",
+# ]
+# ///
+
 import logging
 import sys
 from time import sleep

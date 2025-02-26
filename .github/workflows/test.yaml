@@ -1,5 +1,5 @@
 ---
-name: CI Test
+name: Test
 
 on:
   pull_request:
@@ -15,7 +15,7 @@ on:
 
 jobs:
   test:
-    name: CI Test
+    name: Test
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -53,10 +53,10 @@ jobs:
       - name: Check FRR status
         run: |
           sudo journalctl --no-pager -xu frr
-      # Set up Poetry
-      - name: Set up Poetry
+      # Install uv
+      - name: Install uv
         run: |
-          sudo apt-get --no-install-recommends --yes install python3-poetry
+          pipx install uv
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
@@ -70,8 +70,7 @@ jobs:
         name: Start ecmp-manager daemon
         run: |
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
-          poetry install
-          sg frrvty -c "poetry run python3 -u daemon.py"
+          sg frrvty -c "uv run python3 -u daemon.py"
         timeout-minutes: 1
       # Print the FRR routing table
       - name: Print the FRR routing table
