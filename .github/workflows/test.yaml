@@ -53,8 +53,8 @@ jobs:
       - name: Check FRR status
         run: |
           sudo journalctl --no-pager -xu frr
-      # Set up Poetry
-      - name: Set up Poetry
+      # Install uv
+      - name: Install uv
         run: |
           pipx install uv
       # Print IP diagnostics
