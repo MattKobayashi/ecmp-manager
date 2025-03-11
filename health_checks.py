@@ -1,3 +1,15 @@
+"""
+Network interface health checking functionality.
+
+This module provides utilities for checking interface connectivity and health by:
+- Detecting gateway IP and MAC addresses from system neighbor tables
+- Performing TCP connectivity checks to verify end-to-end connectivity
+- Validating interface operational status
+
+The health check implementation uses scapy to send targeted TCP SYN packets
+through specific interfaces and gateways to verify route viability.
+"""
+
 import json
 import logging
 import os

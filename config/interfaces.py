@@ -1,3 +1,15 @@
+"""
+Network interface configuration models and utilities.
+
+This module provides:
+- Interface configuration class for representing monitored network interfaces
+- System interface discovery functionality
+- Data structures for tracking interface properties and health check parameters
+
+The Interface class encapsulates configuration settings needed for monitoring
+and route management, including metric values and health check targets.
+"""
+
 import os
 
 
