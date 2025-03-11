@@ -72,7 +72,11 @@ jobs:
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
           sg frrvty -c "uv run python3 -u daemon.py"
         timeout-minutes: 1
-      # Print the FRR routing table
-      - name: Print the FRR routing table
+      # Print IP diagnostics
+      - name: Print IP diagnostics
         run: |
+          sudo ip address show
+          echo '---'
+          sudo ip route show
+          echo '---'
           sg frrvty -c "vtysh -c 'show ip route'"
