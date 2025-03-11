@@ -1,10 +1,15 @@
-# /// script
-# requires-python = ">=3.13"
-# dependencies = [
-#     "scapy==2.6.1",
-#     "toml==0.10.2",
-# ]
-# ///
+"""
+Main daemon process for ECMP Manager.
+
+This module implements the core control loop that:
+- Monitors network interface health status
+- Manages equal-cost multi-path (ECMP) routes via FRRouting
+- Dynamically updates routing tables based on interface availability
+- Handles configuration changes and service lifecycle events
+
+The daemon continuously evaluates interface connectivity using health checks
+and adjusts the routing table to maintain optimal network paths.
+"""
 
 import logging
 import sys

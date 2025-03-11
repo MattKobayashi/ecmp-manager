@@ -1,7 +1,14 @@
-# /// script
-# requires-python = ">=3.13"
-# dependencies = []
-# ///
+"""
+FRRouting integration for managing dynamic routes.
+
+This module provides a client interface to the FRRouting daemon for:
+- Adding and removing default routes with specific metrics
+- Tracking installed routes to ensure proper cleanup
+- Validating connection to the FRR service
+
+Commands are executed through the vtysh shell interface to make route changes
+persistent within the FRR routing daemon.
+"""
 
 import logging
 import subprocess
