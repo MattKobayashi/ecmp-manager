@@ -1,8 +1,3 @@
-# /// script
-# requires-python = ">=3.13"
-# dependencies = []
-# ///
-
 import logging
 import subprocess
 
