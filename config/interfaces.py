@@ -29,6 +29,6 @@ def get_system_interfaces():
     """Get list of system network interfaces excluding loopback"""
     net_dir = '/sys/class/net'
     if os.path.exists(net_dir):
-        return [iface for iface in os.listdir(net_dir) 
+        return [iface for iface in os.listdir(net_dir)
                 if iface != 'lo' and not iface.startswith('veth')]
     return []
