@@ -1,27 +1,8 @@
 ---
-name: Test
-
-on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "**.py"
-      - "**.toml"
-      - "**.yaml"
-      - "**.sh"
-      - "Dockerfile"
-  workflow_dispatch:
-
 jobs:
-  test:
-    name: Test
+  tests:
+    name: Tests
     runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        container: [ecmp-manager]
     steps:
       # Set up Python 3.13
       # https://github.com/actions/setup-python
@@ -80,3 +61,17 @@ jobs:
           sudo ip route show
           echo '---'
           sg frrvty -c "vtysh -c 'show ip route'"
+name: Test
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "**.py"
+      - "**.sh"
+      - "**.toml"
+      - "**.yaml"
+      - "Dockerfile"
+  workflow_dispatch:
+permissions:
+  contents: read
