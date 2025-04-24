@@ -1,7 +1,7 @@
 ---
 jobs:
-  tests:
-    name: Tests
+  daemon:
+    name: Daemon
     runs-on: ubuntu-24.04
     steps:
       # Set up Python 3.13
@@ -61,7 +61,7 @@ jobs:
           sudo ip route show
           echo '---'
           sg frrvty -c "vtysh -c 'show ip route'"
-name: Tests
+name: Test
 on:
   pull_request:
     branches:
@@ -72,6 +72,7 @@ on:
       - "**.toml"
       - "**.yaml"
       - "Dockerfile"
+      - "requirements.txt"
   workflow_dispatch:
 permissions:
   contents: read
