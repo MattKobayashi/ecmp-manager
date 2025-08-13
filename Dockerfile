@@ -1,4 +1,4 @@
-FROM debian:12-slim@sha256:8f8e63bb364a33694362f38ee9a9e38b09eb9eb138584693800b87ca173bfd4a
+FROM debian:13-slim@sha256:d1962fb24ef3b960c6a27c0a2b630b048f263e8811919ed80a2a8f14a276f7ed
 
 # Install FRR and dependencies
 RUN apt-get update \
