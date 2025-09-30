@@ -63,6 +63,10 @@ jobs:
           sudo ip route show
           echo '---'
           sg frrvty -c "vtysh -c 'show ip route'"
+      # Check routing table output
+      - name: Check routing table output
+        run: |
+          sg frrvty -c "vtysh -c 'show ip route'" | grep -q '0.0.0.0/0 \[10/0\]'
   kernel:
     name: Linux Kernel
     runs-on: ubuntu-24.04
@@ -103,6 +107,10 @@ jobs:
           sudo ip address show
           echo '---'
           sudo ip route show
+      # Check routing table output
+      - name: Check routing table output
+        run: |
+          sudo ip route show | grep -q 'metric 10 '
 name: Test
 on:
   pull_request:
