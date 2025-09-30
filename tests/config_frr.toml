@@ -1,17 +1,12 @@
-# [interface.auto]
-# check_interval = 10
-# target_ip = "1.1.1.1"
-# metric = 200
-
 [interface.eth0]
 check_interval = 5
 target_ip = "1.1.1.1"
-metric = 100
+metric = 10
 
 [interface.eth1]
 check_interval = 5
 target_ip = "1.1.1.1"
-metric = 200
+metric = 20
 
 [routing]
 backend = "frr"
