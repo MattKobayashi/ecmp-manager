@@ -45,6 +45,8 @@ jobs:
           echo '---'
           sudo ip route show
           echo '---'
+          sudo ip neigh show
+          echo '---'
           sg frrvty -c "vtysh -c 'show ip route'"
       # Start the daemon
       - continue-on-error: true
@@ -61,6 +63,8 @@ jobs:
           sudo ip address show
           echo '---'
           sudo ip route show
+          echo '---'
+          sudo ip neigh show
           echo '---'
           sg frrvty -c "vtysh -c 'show ip route'"
       # Check routing table output
@@ -92,6 +96,8 @@ jobs:
           sudo ip address show
           echo '---'
           sudo ip route show
+          echo '---'
+          sudo ip neigh show
       # Start the daemon
       - continue-on-error: true
         env:
@@ -107,6 +113,8 @@ jobs:
           sudo ip address show
           echo '---'
           sudo ip route show
+          echo '---'
+          sudo ip neigh show
       # Check routing table output
       - name: Check routing table output
         run: |

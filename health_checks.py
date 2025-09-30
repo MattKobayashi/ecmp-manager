@@ -35,10 +35,15 @@ def get_gateway_info(interface) -> Optional[tuple[str, str]]:
         )
         neighbours = json.loads(result.stdout)
 
-        # Find first IPv4 neighbour entry with valid MAC
+        # Find first IPv4 neighbour entry with valid MAC and state REACHABLE
         for entry in neighbours:
             dst_ip = entry.get("dst", "")
-            if dst_ip and is_valid_ipv4(dst_ip) and entry.get("lladdr"):
+            if (
+                dst_ip
+                and is_valid_ipv4(dst_ip)
+                and entry.get("lladdr")
+                and "REACHABLE" in entry.get("state", [])
+            ):
                 logger.debug(
                     "Found gateway %s (%s) on %s",
                     dst_ip,
