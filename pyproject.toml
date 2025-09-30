@@ -1,7 +1,7 @@
 [project]
 name = "ecmp-manager"
-version = "1.0.0"
-description = "Multi-WAN ECMP and failover with support for FRRouting or Linux kernel routing"
+version = "1.1.0"
+description = "Multi-WAN ECMP and failover with support for Linux kernel routing and FRRouting"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

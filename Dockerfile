@@ -14,7 +14,8 @@ WORKDIR /app
 RUN mkdir -p /var/log/ecmp-manager \
     && mkdir -p /var/run/frr \
     && chown -R frr:frr /var/run/frr
-COPY . .
+COPY config/ /app/config/
+COPY *.lock *.py *.sh *.toml requirements.txt /app/
 RUN pip install --break-system-packages --no-cache-dir -r requirements.txt \
     && chmod +x entrypoint.sh
 

@@ -5,12 +5,17 @@ services:
       context: ..
       dockerfile: Dockerfile
     cap_add:
+      - NET_ADMIN
       - NET_RAW
+    environment:
+      - 'ECMP_CONFIG_PATH=/config/config_kernel.toml'
     networks:
       ecmp_test_1:
-        ipv4_address: 10.10.0.1
+        ipv4_address: 10.10.0.5
       ecmp_test_2:
-        ipv4_address: 10.20.0.1
+        ipv4_address: 10.20.0.5
+    volumes:
+      - ./config_kernel.toml:/config/config_kernel.toml:ro
 networks:
   ecmp_test_1:
     ipam:
@@ -18,11 +23,9 @@ networks:
       config:
         - subnet: 10.10.0.0/24
           ip_range: 10.10.0.0/24
-          gateway: 10.10.0.254
   ecmp_test_2:
     ipam:
       driver: default
       config:
         - subnet: 10.20.0.0/24
           ip_range: 10.20.0.0/24
-          gateway: 10.20.0.254
