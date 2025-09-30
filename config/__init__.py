@@ -5,6 +5,7 @@
 # ]
 # ///
 
+import os
 import toml
 from .interfaces import Interface, get_system_interfaces
 
@@ -16,35 +17,58 @@ class Config:
         interfaces: List[Interface] - Network interfaces being monitored
         min_check_interval: int - Smallest check interval from all interfaces
                                   (automatically calculated)
+        routing_backend: str - Routing backend to use ("frr" or "kernel")
+        log_level: str - Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     """
 
-    def __init__(self, interfaces):
+    def __init__(self, interfaces, routing_backend="kernel", log_level="INFO"):
         self.interfaces = interfaces
-        self.min_check_interval = min(
-            iface.check_interval for iface in interfaces
-        )
+        self.routing_backend = routing_backend
+        self.log_level = log_level.upper()
+        self.min_check_interval = min(iface.check_interval for iface in interfaces)
 
 
 def load_config():
-    """Load and validate routing configuration from config.toml.
+    """Load and validate routing configuration from TOML file.
+
+    The configuration file path can be specified via the ECMP_CONFIG_PATH
+    environment variable. If not set, defaults to 'config/config.toml'.
 
     Returns:
-        Config: Configured interfaces and check interval
+        Config: Configured interfaces, check interval, and routing backend
 
     Raises:
         ValueError: For invalid configurations, including:
+            - Invalid routing backend specified
             - Missing required parameters in [interface.auto]
             - No system interfaces found when using auto-config
             - No valid interfaces configured
-        FileNotFoundError: If config.toml is missing
+        FileNotFoundError: If configuration file is missing
 
     Processes both explicitly configured interfaces and auto-detected system
     interfaces. Auto-configuration requires all interface parameters and will
     add any system interfaces not explicitly configured.
     """
 
-    config_path = "config/config.toml"
+    config_path = os.getenv("ECMP_CONFIG_PATH", "config/config.toml")
     data = toml.load(config_path)
+
+    # Load general configuration
+    general_config = data.get("general", {})
+    routing_backend = general_config.get("backend", "frr")
+    log_level = general_config.get("log_level", "INFO")
+
+    if routing_backend not in ("frr", "kernel"):
+        raise ValueError(
+            f"Invalid routing backend '{routing_backend}'. Must be 'frr' or 'kernel'"
+        )
+
+    # Validate log level
+    valid_log_levels = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
+    if log_level.upper() not in valid_log_levels:
+        raise ValueError(
+            f"Invalid log level '{log_level}'. Must be one of: {', '.join(valid_log_levels)}"
+        )
 
     interfaces = []
     interface_data = data.get("interface", {})
@@ -57,11 +81,7 @@ def load_config():
         if interface_name == "auto":
             # Validate auto configuration has all required parameters
             if not all(
-                k in iface_data for k in (
-                    "metric",
-                    "check_interval",
-                    "target_ip"
-                )
+                k in iface_data for k in ("metric", "check_interval", "target_ip")
             ):
                 raise ValueError(
                     "Auto configuration requires metric, check_interval, and target_ip"
@@ -69,12 +89,14 @@ def load_config():
             auto_params = iface_data
         else:
             # Existing interface processing
-            interfaces.append(Interface(
-                name=interface_name,
-                metric=iface_data["metric"],
-                check_interval=iface_data["check_interval"],
-                target_ip=iface_data["target_ip"]
-            ))
+            interfaces.append(
+                Interface(
+                    name=interface_name,
+                    metric=iface_data["metric"],
+                    check_interval=iface_data["check_interval"],
+                    target_ip=iface_data["target_ip"],
+                )
+            )
 
     # Add auto-detected interfaces if specified
     if auto_params is not None:
@@ -87,14 +109,16 @@ def load_config():
         for iface_name in system_ifaces:
             # Skip interfaces already explicitly configured
             if not any(i.name == iface_name for i in interfaces):
-                interfaces.append(Interface(
-                    name=iface_name,
-                    metric=auto_params["metric"],
-                    check_interval=auto_params["check_interval"],
-                    target_ip=auto_params["target_ip"]
-                ))
+                interfaces.append(
+                    Interface(
+                        name=iface_name,
+                        metric=auto_params["metric"],
+                        check_interval=auto_params["check_interval"],
+                        target_ip=auto_params["target_ip"],
+                    )
+                )
 
     if not interfaces:
-        raise ValueError("No interfaces defined in config.toml")
+        raise ValueError(f"No interfaces defined in {config_path}")
 
-    return Config(interfaces)
+    return Config(interfaces, routing_backend, log_level)

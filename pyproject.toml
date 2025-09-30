@@ -1,10 +1,11 @@
 [project]
 name = "ecmp-manager"
 version = "1.0.0"
-description = "Multi-WAN ECMP and failover for FRRouting"
+description = "Multi-WAN ECMP and failover with support for FRRouting or Linux kernel routing"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "scapy==2.6.1",
     "toml==0.10.2",
+    "pyroute2==0.9.4",
 ]

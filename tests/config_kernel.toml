@@ -1,0 +1,13 @@
+[interface.eth0]
+check_interval = 5
+target_ip = "1.1.1.1"
+metric = 10
+
+[interface.eth1]
+check_interval = 5
+target_ip = "1.1.1.1"
+metric = 20
+
+[general]
+backend = "kernel"
+log_level = "DEBUG"

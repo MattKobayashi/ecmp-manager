@@ -12,3 +12,9 @@ metric = 100
 check_interval = 5
 target_ip = "1.1.1.1"
 metric = 200
+
+[general]
+backend = "kernel"
+# backend = "frr"
+log_level = "INFO"
+# log_level = "DEBUG"

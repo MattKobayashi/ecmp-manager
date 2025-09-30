@@ -1,7 +1,7 @@
 ---
 jobs:
-  daemon:
-    name: Daemon
+  frr:
+    name: FRRouting
     runs-on: ubuntu-24.04
     steps:
       # Set up Python 3.13
@@ -37,7 +37,7 @@ jobs:
       # Install uv
       - name: Install uv
         run: |
-          pipx install uv
+          pipx install --global uv
       # Print IP diagnostics
       - name: Print IP diagnostics
         run: |
@@ -48,6 +48,8 @@ jobs:
           sg frrvty -c "vtysh -c 'show ip route'"
       # Start the daemon
       - continue-on-error: true
+        env:
+          ECMP_CONFIG_PATH: "tests/config_frr.toml"
         name: Start ecmp-manager daemon
         run: |
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
@@ -61,6 +63,54 @@ jobs:
           sudo ip route show
           echo '---'
           sg frrvty -c "vtysh -c 'show ip route'"
+      # Check routing table output
+      - name: Check routing table output
+        run: |
+          sg frrvty -c "vtysh -c 'show ip route'" | grep -q '0.0.0.0/0 \[10/0\]'
+  kernel:
+    name: Linux Kernel
+    runs-on: ubuntu-24.04
+    steps:
+      # Set up Python 3.13
+      # https://github.com/actions/setup-python
+      - id: setup-python
+        name: Set up Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
+        with:
+          python-version: "3.13"
+      # Checkout repository
+      # https://github.com/actions/checkout
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      # Install uv
+      - name: Install uv
+        run: |
+          pipx install --global uv
+      # Print IP diagnostics
+      - name: Print IP diagnostics
+        run: |
+          sudo ip address show
+          echo '---'
+          sudo ip route show
+      # Start the daemon
+      - continue-on-error: true
+        env:
+          ECMP_CONFIG_PATH: "tests/config_kernel.toml"
+        name: Start ecmp-manager daemon
+        run: |
+          sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
+          sudo -E uv run python3 -u daemon.py
+        timeout-minutes: 1
+      # Print IP diagnostics
+      - name: Print IP diagnostics
+        run: |
+          sudo ip address show
+          echo '---'
+          sudo ip route show
+      # Check routing table output
+      - name: Check routing table output
+        run: |
+          sudo ip route show | grep -q 'metric 10 '
 name: Test
 on:
   pull_request:
