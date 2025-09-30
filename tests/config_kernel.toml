@@ -15,4 +15,3 @@ metric = 200
 
 [routing]
 backend = "kernel"
-# backend = "frr"

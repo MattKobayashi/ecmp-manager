@@ -2,7 +2,7 @@
 services:
   ecmp-manager:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
     cap_add:
       - NET_ADMIN

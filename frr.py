@@ -25,13 +25,13 @@ class FRRClient:
     def check_frr_running(self) -> bool:
         """Verify FRR is operational by checking version command"""
         try:
-            self._execute_vty_command("show version") 
+            self._execute_vty_command("show version")
             logger.info("FRR connection validated")
             return True
         except (subprocess.CalledProcessError, FileNotFoundError) as e:
             logger.error(
-                "FRR connection failed - Is FRR installed and running? Error: %s", 
-                str(e)
+                "FRR connection failed - Is FRR installed and running? Error: %s",
+                str(e),
             )
             return False
 
@@ -40,17 +40,14 @@ class FRRClient:
         logger.debug("Executing FRR command: %r", command)
         try:
             subprocess.run(
-                ["vtysh", "-c", command],
-                check=True,
-                stderr=subprocess.PIPE,
-                text=True
+                ["vtysh", "-c", command], check=True, stderr=subprocess.PIPE, text=True
             )
             logger.debug("FRR command executed successfully")
         except subprocess.CalledProcessError as e:
             logger.debug(
                 "FRR command failed with code %d. Error: %s",
                 e.returncode,
-                e.stderr.strip()
+                e.stderr.strip(),
             )
             raise
 
@@ -60,17 +57,13 @@ class FRRClient:
             "Attempting to add route for %s (GW: %s, Metric: %s)",
             interface.name,
             gateway_ip,
-            interface.metric
+            interface.metric,
         )
         self._execute_vty_command(
-            f"configure terminal\n"
-            f"ip route 0.0.0.0/0 {gateway_ip} {interface.metric}"
+            f"configure terminal\nip route 0.0.0.0/0 {gateway_ip} {interface.metric}"
         )
         self.installed_routes[interface.name] = (gateway_ip, interface.metric)
-        logger.debug(
-            "Route successfully added for %s",
-            interface.name
-        )
+        logger.debug("Route successfully added for %s", interface.name)
 
     def remove_route(self, interface):
         """Only remove routes we actually added"""
@@ -78,10 +71,9 @@ class FRRClient:
         if not route_info:
             logger.debug("No route present for %s", interface.name)
             return
-            
+
         gateway_ip, metric = route_info
         self._execute_vty_command(
-            f"configure terminal\n"
-            f"no ip route 0.0.0.0/0 {gateway_ip} {metric}"
+            f"configure terminal\nno ip route 0.0.0.0/0 {gateway_ip} {metric}"
         )
         logger.debug("Route successfully removed for %s", interface.name)
