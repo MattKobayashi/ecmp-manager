@@ -39,11 +39,15 @@ def main_loop() -> None:
         SystemExit: On unrecoverable configuration or routing errors
     """
 
-    logging.basicConfig(level=logging.DEBUG)
+    config = load_config()
+
+    # Configure logging based on config file
+    log_level = getattr(logging, config.log_level, logging.INFO)
+    logging.basicConfig(
+        level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
     logger = logging.getLogger(__name__)
     logger.info("Starting ECMP Manager daemon")
-
-    config = load_config()
 
     # Initialize the appropriate routing client based on configuration
     try:

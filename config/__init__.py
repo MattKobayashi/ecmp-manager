@@ -18,11 +18,13 @@ class Config:
         min_check_interval: int - Smallest check interval from all interfaces
                                   (automatically calculated)
         routing_backend: str - Routing backend to use ("frr" or "kernel")
+        log_level: str - Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     """
 
-    def __init__(self, interfaces, routing_backend="kernel"):
+    def __init__(self, interfaces, routing_backend="kernel", log_level="INFO"):
         self.interfaces = interfaces
         self.routing_backend = routing_backend
+        self.log_level = log_level.upper()
         self.min_check_interval = min(iface.check_interval for iface in interfaces)
 
 
@@ -51,13 +53,21 @@ def load_config():
     config_path = os.getenv("ECMP_CONFIG_PATH", "config/config.toml")
     data = toml.load(config_path)
 
-    # Load routing backend configuration
-    routing_config = data.get("routing", {})
-    routing_backend = routing_config.get("backend", "frr")
+    # Load general configuration
+    general_config = data.get("general", {})
+    routing_backend = general_config.get("backend", "frr")
+    log_level = general_config.get("log_level", "INFO")
 
     if routing_backend not in ("frr", "kernel"):
         raise ValueError(
             f"Invalid routing backend '{routing_backend}'. Must be 'frr' or 'kernel'"
+        )
+
+    # Validate log level
+    valid_log_levels = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
+    if log_level.upper() not in valid_log_levels:
+        raise ValueError(
+            f"Invalid log level '{log_level}'. Must be one of: {', '.join(valid_log_levels)}"
         )
 
     interfaces = []
@@ -111,4 +121,4 @@ def load_config():
     if not interfaces:
         raise ValueError(f"No interfaces defined in {config_path}")
 
-    return Config(interfaces, routing_backend)
+    return Config(interfaces, routing_backend, log_level)

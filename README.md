@@ -46,10 +46,25 @@ check_interval = 5
 target_ip = "8.8.8.8"
 metric = 200
 
-[routing]
+[general]
 backend = "kernel"
 # backend = "frr"
+log_level = "INFO"
+# log_level = "DEBUG"
 ```
+
+### General Options
+
+**log_level:**
+
+- Sets the logging verbosity level
+- Options: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+- Default: `INFO`
+- `DEBUG`: Detailed diagnostic information
+- `INFO`: General informational messages
+- `WARNING`: Warning messages for potentially problematic situations
+- `ERROR`: Error messages for serious problems
+- `CRITICAL`: Critical errors that may cause the application to abort
 
 ### Routing Backend Options
 
@@ -85,11 +100,8 @@ Backend-specific requirements:
 ### Local Execution
 
 ```bash
-# Start daemon in background
+# Start daemon
 uv run python -m daemon
-
-# Foreground mode with debug output
-uv run python -m daemon --foreground
 
 # Use custom config path
 ECMP_CONFIG_PATH=/etc/ecmp/config.toml uv run python -m daemon
