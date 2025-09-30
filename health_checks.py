@@ -42,7 +42,7 @@ def get_gateway_info(interface) -> Optional[tuple[str, str]]:
                 dst_ip
                 and is_valid_ipv4(dst_ip)
                 and entry.get("lladdr")
-                and entry.get("state") == "REACHABLE"
+                and "REACHABLE" in entry.get("state", [])
             ):
                 logger.debug(
                     "Found gateway %s (%s) on %s",
