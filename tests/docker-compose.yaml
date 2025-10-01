@@ -8,12 +8,14 @@ services:
       - NET_ADMIN
       - NET_RAW
     environment:
-      - 'ECMP_CONFIG_PATH=/config/config_kernel.toml'
+      - "ECMP_CONFIG_PATH=/config/config_kernel.toml"
     networks:
       ecmp_test_1:
-        ipv4_address: 10.10.0.5
+        ipv4_address: 10.10.0.1
+        priority: 10
       ecmp_test_2:
-        ipv4_address: 10.20.0.5
+        ipv4_address: 10.20.0.1
+        priority: 0
     volumes:
       - ./config_kernel.toml:/config/config_kernel.toml:ro
 networks:
@@ -22,10 +24,10 @@ networks:
       driver: default
       config:
         - subnet: 10.10.0.0/24
-          ip_range: 10.10.0.0/24
+          gateway: 10.10.0.254
   ecmp_test_2:
     ipam:
       driver: default
       config:
         - subnet: 10.20.0.0/24
-          ip_range: 10.20.0.0/24
+          gateway: 10.20.0.254
