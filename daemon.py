@@ -13,6 +13,7 @@ and adjusts the routing table to maintain optimal network paths.
 
 import logging
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 from frr import FRRClient
 from kernel import KernelRoutingClient
@@ -20,20 +21,80 @@ from health_checks import is_interface_healthy
 from config import load_config
 
 
+def check_and_process_interface(interface, routing_client, logger):
+    """Check a single interface and process the result.
+
+    This function is designed to be executed in parallel for multiple interfaces.
+    It performs health checks and updates routing table accordingly.
+
+    Args:
+        interface: Interface object to check
+        routing_client: Routing client instance (FRRClient or KernelRoutingClient)
+        logger: Logger instance for output
+
+    Returns:
+        tuple: (interface, success, error_message) where success is True if check completed
+    """
+    try:
+        logger.debug("Checking interface %s", interface.name)
+        healthy, gateway_ip = is_interface_healthy(
+            interface,
+            check_ip=interface.target_ip,
+            check_port=80,
+            timeout=1,
+        )
+
+        if healthy and gateway_ip:
+            # Update interface's gateway if it changed
+            if interface.gateway != gateway_ip:
+                logger.info(
+                    "Gateway for %s changed from %s to %s",
+                    interface.name,
+                    interface.gateway or "None",
+                    gateway_ip,
+                )
+                interface.gateway = gateway_ip
+
+            try:
+                routing_client.add_route(interface, gateway_ip)
+            except Exception as e:
+                logger.error("Route add failed for %s: %s", interface.name, str(e))
+                return (interface, False, f"Route add failed: {str(e)}")
+        else:
+            # Interface is unhealthy or no gateway found
+            if interface.gateway:
+                logger.info(
+                    "Interface %s became unhealthy, removing route via gateway %s",
+                    interface.name,
+                    interface.gateway,
+                )
+                routing_client.remove_route(interface)
+                interface.gateway = None
+
+        return (interface, True, None)
+    except Exception as e:
+        logger.error("Interface check failed for %s: %s", interface.name, str(e))
+        return (interface, False, str(e))
+
+
 def main_loop() -> None:
-    """ECMP Manager's main control loop.
+    """ECMP Manager's main control loop with parallel interface checking.
 
     Responsibilities:
     - Loads routing configuration from config.toml
     - Initializes routing client connection (FRRouting or Linux kernel)
-    - Continuously monitors interface health:
-      - Performs TCP connectivity checks
+    - Continuously monitors interface health using parallel execution:
+      - Performs TCP connectivity checks concurrently for all interfaces
       - Maintains ECMP routes via configured routing backend
       - Adjusts routes based on interface status changes
     - Handles graceful shutdown on interrupt signals
 
     The loop runs indefinitely with sleep intervals determined by the
     smallest check_interval from all configured interfaces.
+
+    Note:
+        Interface checks are executed in parallel using ThreadPoolExecutor to
+        minimize total check time and improve failure detection speed.
 
     Raises:
         SystemExit: On unrecoverable configuration or routing errors
@@ -73,47 +134,35 @@ def main_loop() -> None:
 
     try:
         while True:
-            for interface in config.interfaces:
-                try:
-                    logger.debug("Checking interface %s", interface.name)
-                    healthy, gateway_ip = is_interface_healthy(
-                        interface,
-                        check_ip=interface.target_ip,
-                        check_port=80,
-                        timeout=1,
-                    )
-                    if healthy and gateway_ip:
-                        # Update interface's gateway if it changed
-                        if interface.gateway != gateway_ip:
-                            logger.info(
-                                "Gateway for %s changed from %s to %s",
-                                interface.name,
-                                interface.gateway or "None",
-                                gateway_ip,
-                            )
-                            interface.gateway = gateway_ip
+            # Use ThreadPoolExecutor to check all interfaces in parallel
+            with ThreadPoolExecutor(max_workers=len(config.interfaces)) as executor:
+                # Submit all interface checks
+                future_to_interface = {
+                    executor.submit(
+                        check_and_process_interface, interface, routing_client, logger
+                    ): interface
+                    for interface in config.interfaces
+                }
 
-                        try:
-                            routing_client.add_route(interface, gateway_ip)
-                        except Exception as e:
-                            logger.error(
-                                "Route add failed for %s: %s", interface.name, str(e)
-                            )
-                    else:
-                        # Interface is unhealthy or no gateway found
-                        if interface.gateway:
-                            logger.info(
-                                "Interface %s became unhealthy, removing route via gateway %s",
+                # Process results as they complete
+                for future in as_completed(future_to_interface):
+                    interface = future_to_interface[future]
+                    try:
+                        interface_obj, success, error_msg = future.result()
+                        if not success and error_msg:
+                            logger.debug(
+                                "Interface %s check completed with issues: %s",
                                 interface.name,
-                                interface.gateway,
+                                error_msg,
                             )
-                            routing_client.remove_route(interface)
-                            interface.gateway = None
-                except Exception as e:
-                    logger.error(
-                        "Interface check failed for %s: %s", interface.name, str(e)
-                    )
-                    continue  # Continue with next interface
+                    except Exception as e:
+                        logger.error(
+                            "Unexpected error processing interface %s: %s",
+                            interface.name,
+                            str(e),
+                            exc_info=True,
+                        )
+
             sleep(config.min_check_interval)
     except KeyboardInterrupt:
         logger.info("Received shutdown signal")
