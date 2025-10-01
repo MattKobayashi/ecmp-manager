@@ -35,13 +35,42 @@ class KernelRoutingClient:
             return False
 
     def add_route(self, interface, gateway_ip: str):
-        """Add a default route via the kernel routing table"""
+        """Add or update route, removing old route if gateway changed"""
         logger.debug(
             "Attempting to add route for %s (GW: %s, Metric: %s)",
             interface.name,
             gateway_ip,
             interface.metric,
         )
+
+        # Check if route exists with different gateway
+        existing_route = self.installed_routes.get(interface.name)
+        if existing_route:
+            existing_gateway, existing_metric = existing_route
+            if existing_gateway != gateway_ip:
+                logger.info(
+                    "Gateway changed for %s from %s to %s, updating route",
+                    interface.name,
+                    existing_gateway,
+                    gateway_ip,
+                )
+                # Remove old route first
+                try:
+                    with IPRoute() as ipr:
+                        idx = ipr.link_lookup(ifname=interface.name)
+                        if idx:
+                            ipr.route(
+                                "del",
+                                dst="0.0.0.0",
+                                mask=0,
+                                gateway=existing_gateway,
+                                oif=idx[0],
+                                priority=existing_metric,
+                            )
+                except Exception as e:
+                    logger.debug(
+                        "Failed to remove old route (may not exist): %s", str(e)
+                    )
 
         try:
             with IPRoute() as ipr:

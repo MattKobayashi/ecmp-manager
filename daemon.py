@@ -83,16 +83,32 @@ def main_loop() -> None:
                         timeout=1,
                     )
                     if healthy and gateway_ip:
+                        # Update interface's gateway if it changed
+                        if interface.gateway != gateway_ip:
+                            logger.info(
+                                "Gateway for %s changed from %s to %s",
+                                interface.name,
+                                interface.gateway or "None",
+                                gateway_ip,
+                            )
+                            interface.gateway = gateway_ip
+
                         try:
                             routing_client.add_route(interface, gateway_ip)
                         except Exception as e:
                             logger.error(
                                 "Route add failed for %s: %s", interface.name, str(e)
                             )
-                    elif (
-                        gateway_ip is not None
-                    ):  # Only remove if we had a valid gateway
-                        routing_client.remove_route(interface)
+                    else:
+                        # Interface is unhealthy or no gateway found
+                        if interface.gateway:
+                            logger.info(
+                                "Interface %s became unhealthy, removing route via gateway %s",
+                                interface.name,
+                                interface.gateway,
+                            )
+                            routing_client.remove_route(interface)
+                            interface.gateway = None
                 except Exception as e:
                     logger.error(
                         "Interface check failed for %s: %s", interface.name, str(e)

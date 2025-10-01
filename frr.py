@@ -52,13 +52,31 @@ class FRRClient:
             raise
 
     def add_route(self, interface, gateway_ip: str):
-        """Store route parameters when adding routes"""
+        """Add or update route, removing old route if gateway changed"""
         logger.debug(
             "Attempting to add route for %s (GW: %s, Metric: %s)",
             interface.name,
             gateway_ip,
             interface.metric,
         )
+
+        # Check if route exists with different gateway
+        existing_route = self.installed_routes.get(interface.name)
+        if existing_route:
+            existing_gateway, existing_metric = existing_route
+            if existing_gateway != gateway_ip:
+                logger.info(
+                    "Gateway changed for %s from %s to %s, updating route",
+                    interface.name,
+                    existing_gateway,
+                    gateway_ip,
+                )
+                # Remove old route first
+                self._execute_vty_command(
+                    f"configure terminal\nno ip route 0.0.0.0/0 {existing_gateway} {existing_metric}"
+                )
+
+        # Add new route
         self._execute_vty_command(
             f"configure terminal\nip route 0.0.0.0/0 {gateway_ip} {interface.metric}"
         )
