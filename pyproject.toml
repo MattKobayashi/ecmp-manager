@@ -3,7 +3,7 @@ name = "ecmp-manager"
 version = "1.1.0"
 description = "Multi-WAN ECMP and failover with support for Linux kernel routing and FRRouting"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.13, <3.14"
 dependencies = [
     "scapy==2.6.1",
     "toml==0.10.2",
