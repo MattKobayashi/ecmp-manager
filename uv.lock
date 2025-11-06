@@ -14,21 +14,21 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "pyroute2", specifier = "==0.9.4" },
+    { name = "pyroute2", specifier = "==0.9.5" },
     { name = "scapy", specifier = "==2.6.1" },
     { name = "toml", specifier = "==0.10.2" },
 ]
 
 [[package]]
 name = "pyroute2"
-version = "0.9.4"
+version = "0.9.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "win-inet-pton", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b0/5e/fc64e211cce0078555c6db98aaf14348aed527565f3c4876913a290a5b2c/pyroute2-0.9.4.tar.gz", hash = "sha256:3cbccbe1af0c2b2aeae81b327e0e91aa94c81ab19f851e74b26bef70202f3070", size = 463980, upload-time = "2025-07-29T14:35:27.866Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/b2/1019ddc278549fb7e64a16d7775e0f7d981135f762b8706e583414d655e3/pyroute2-0.9.5.tar.gz", hash = "sha256:a198ccbe545b031b00b10da4b44df33d548db04af944be8107c05a215ba03872", size = 969492, upload-time = "2025-11-02T18:42:49.603Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e2/89/c011b555ccde0e5846ad3bb5a091fd0fcac997156406a9ad107f81cf91c9/pyroute2-0.9.4-py3-none-any.whl", hash = "sha256:4e12437d18f6f42912cbd3f870edf06896183a78fd0c8126ba7a72a81f28d6cf", size = 467555, upload-time = "2025-07-29T14:35:23.88Z" },
+    { url = "https://files.pythonhosted.org/packages/bd/66/995c65e7566543e941705f9b1b99ebfd7f9d3ed67c8eb7cb47f30168dc72/pyroute2-0.9.5-py3-none-any.whl", hash = "sha256:e7d485ce8274cbf473e9092fa65585faf8a3df5fe05ecf497cb9c5b1516ba09f", size = 480641, upload-time = "2025-11-02T18:42:45.75Z" },
 ]
 
 [[package]]
