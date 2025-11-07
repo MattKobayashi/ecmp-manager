@@ -7,5 +7,5 @@ requires-python = ">=3.14, <3.15"
 dependencies = [
     "scapy==2.6.1",
     "toml==0.10.2",
-    "pyroute2==0.9.4",
+    "pyroute2==0.9.5",
 ]
