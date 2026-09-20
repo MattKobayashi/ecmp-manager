@@ -105,7 +105,7 @@ jobs:
         name: Start ecmp-manager daemon
         run: |
           sudo setcap CAP_NET_RAW=eip $(readlink -f $(which python3))
-          sudo -E uv run python3 -u daemon.py
+          sudo env ECMP_CONFIG_PATH="$ECMP_CONFIG_PATH" uv run python3 -u daemon.py
         timeout-minutes: 1
       # Print IP diagnostics
       - name: Print IP diagnostics

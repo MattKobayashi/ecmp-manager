@@ -94,9 +94,19 @@ class KernelRoutingClient:
         except Exception as e:
             # Route might already exist, check if we need to replace it
             if "File exists" in str(e):
-                logger.debug(
-                    "Route already exists for %s, updating tracking", interface.name
-                )
+                if interface.name not in self.installed_routes:
+                    logger.warning(
+                        "Route add for %s hit an existing route (GW: %s, Metric: %s);"
+                        " a conflicting route may be installed by another process",
+                        interface.name,
+                        gateway_ip,
+                        interface.metric,
+                    )
+                else:
+                    logger.debug(
+                        "Route already exists for %s, updating tracking",
+                        interface.name,
+                    )
                 self.installed_routes[interface.name] = (gateway_ip, interface.metric)
             else:
                 logger.error("Failed to add route for %s: %s", interface.name, str(e))

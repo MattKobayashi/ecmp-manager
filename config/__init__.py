@@ -19,13 +19,17 @@ class Config:
                                   (automatically calculated)
         routing_backend: str - Routing backend to use ("frr" or "kernel")
         log_level: str - Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        config_path: str - Path of the configuration file that was loaded
     """
 
-    def __init__(self, interfaces, routing_backend="kernel", log_level="INFO"):
+    def __init__(
+        self, interfaces, routing_backend="kernel", log_level="INFO", config_path=None
+    ):
         self.interfaces = interfaces
         self.routing_backend = routing_backend
         self.log_level = log_level.upper()
         self.min_check_interval = min(iface.check_interval for iface in interfaces)
+        self.config_path = config_path
 
 
 def load_config():
@@ -121,4 +125,4 @@ def load_config():
     if not interfaces:
         raise ValueError(f"No interfaces defined in {config_path}")
 
-    return Config(interfaces, routing_backend, log_level)
+    return Config(interfaces, routing_backend, log_level, config_path)
