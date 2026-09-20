@@ -2,7 +2,7 @@
 jobs:
   frr:
     name: FRRouting
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       # Set up Python
       # https://github.com/actions/setup-python
@@ -73,7 +73,7 @@ jobs:
           sg frrvty -c "vtysh -c 'show ip route'" | grep -q '0.0.0.0/0 \[10/0\]'
   kernel:
     name: Linux Kernel
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       # Set up Python 3.13
       # https://github.com/actions/setup-python
