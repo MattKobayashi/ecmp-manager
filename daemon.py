@@ -108,6 +108,12 @@ def main_loop() -> None:
         level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     logger = logging.getLogger(__name__)
+    logger.info(
+        "Loaded configuration from %s (backend=%s, %d interface(s))",
+        config.config_path,
+        config.routing_backend,
+        len(config.interfaces),
+    )
     logger.info("Starting ECMP Manager daemon")
 
     # Initialize the appropriate routing client based on configuration
